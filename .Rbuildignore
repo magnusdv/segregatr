@@ -5,3 +5,4 @@
 ^CRAN-RELEASE$
 ^revdep$
 ^data-raw$
+^README\.Rmd$
