@@ -1,0 +1,68 @@
+startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = NULL) {
+
+  # Penetrances
+  if(is.null(liabilityClasses))
+    liabilityClasses = rep_len(1, pedsize(x))
+  if(is.null(dim(penetrances)))
+    penetrances = as.data.frame(as.list(penetrances))
+
+  if(!all(liabilityClasses %in% 1:nrow(penetrances)))
+    stop2("Illegal liability class: ", setdiff(liabilityClasses, 1:nrow(penetrances)))
+
+  glist = pedprobr:::.buildGenolist(x, marker, eliminate = 1)
+
+  if (attr(glist, "impossible")) {
+    dat = structure(list(), impossible = TRUE)
+    return(dat)
+  }
+
+  FOU = founders(x, internal = TRUE)
+
+  # Founder inbreeding: A vector of length pedsize(x), with NA's at nonfounders
+  # Enables quick look-up e.g. FOU_INB[i].
+  FOU_INB = rep(NA_real_, pedsize(x))
+  FOU_INB[FOU] = founderInbreeding(x)
+
+  # Allele frequencies (used in HW below)
+  afr = afreq(marker)
+
+  # Initialise `impossible` attribute
+  impossible = FALSE
+
+  dat = lapply(1:pedsize(x), function(i) {
+    h = glist[[i]]
+
+    # Penetrance values
+    liab = liabilityClasses[i]
+    penet = as.numeric(penetrances[liab, 1:3])
+
+    # Affection status priors
+    nmut = h[1, ] + h[2, ] - 2
+    affi = aff[i]
+    if(is.na(affi))
+      affpriors = rep_len(1, length(nmut))
+    else if(affi)
+      affpriors = penet[nmut + 1]
+    else
+      affpriors = 1 - penet[nmut + 1]
+
+    # Total genotype priors
+    prob = as.numeric(affpriors)
+    if (i %in% FOU)
+      prob = prob * pedprobr::HWprob(h[1, ], h[2, ], afr, f = FOU_INB[i])
+
+    # Remove impossible entries
+    zer = prob == 0
+    if (any(zer)) {
+      h = h[, !zer, drop = F]
+      prob = prob[!zer]
+      if (all(zer))
+        impossible = TRUE
+    }
+
+    list(hap = h, prob = prob)
+  })
+
+  attr(dat, "impossible") = impossible
+  dat
+}

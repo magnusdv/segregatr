@@ -1,0 +1,22 @@
+Package: segregatr
+Title: Segregation Analysis for Variant Pathogenicity Classification
+Version: 0.1.0
+Authors@R: 
+    person(given = "Magnus Dehli",
+           family = "Vigeland",
+           role = c("aut", "cre"),
+           email = "m.d.vigeland@medisin.uio.no",
+           comment = c(ORCID = "0000-0002-9134-4962"))
+Description: Computation of Bayes factors for evaluating segregation evidence
+    for pathogenicity of a genetic variant. 
+License: GPL-3
+Encoding: UTF-8
+Language: en-GB
+LazyData: true
+Suggests: 
+    testthat (>= 2.1.0),
+Imports: 
+    pedtools,
+    pedprobr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
