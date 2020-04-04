@@ -6,6 +6,9 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
   if(is.null(dim(penetrances)))
     penetrances = as.data.frame(as.list(penetrances))
 
+  if(anyNA(penetrances))
+    stop2("Some penetrance values are missing")
+
   if(!all(liabilityClasses %in% 1:nrow(penetrances)))
     stop2("Illegal liability class: ", setdiff(liabilityClasses, 1:nrow(penetrances)))
 

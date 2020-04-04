@@ -40,6 +40,9 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   labs = labels(x)
 
+  if(length(proband) == 0) stop2("A proband must be specified")
+  if(is.null(freq) || is.na(freq)) stop2("An allele frequency must be specified")
+
   if(!proband %in% affected)
     stop2("The proband must be affected")
   if(!proband %in% carriers)
