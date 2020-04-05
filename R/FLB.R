@@ -38,15 +38,37 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
                penetrances, liabilityClasses = NULL,
                details = FALSE, plot = FALSE) {
 
+  ### Note to self: Don't mess with the order of input checks.
+
+  if(!is.ped(x))
+    stop2("The first argument must be a `ped` object")
+
   labs = labels(x)
 
-  if(length(proband) == 0) stop2("A proband must be specified")
-  if(is.null(freq) || is.na(freq)) stop2("An allele frequency must be specified")
-
+  if(length(proband) == 0 || proband == "")
+    stop2("A proband must be specified")
   if(!proband %in% affected)
     stop2("The proband must be affected")
   if(!proband %in% carriers)
     stop2("The proband must be a carrier")
+
+  for(ids in list(proband, affected, unknown, carriers, noncarriers)) {
+    validID = ids %in% labs
+    if(!all(validID))
+      stop2("Unknown ID label: ", ids[!validID])
+  }
+
+  if(length(err1 <- intersect(affected, unknown)))
+    stop2(sprintf("Individual %s cannot be both *affected* and *unknown*", err1[1]))
+
+  if(length(err2 <- intersect(carriers, noncarriers)))
+    stop2(sprintf("Individual %s cannot be both a *carrier* and a *non-carrier*", err2[1]))
+
+  if(is.null(freq) || is.na(freq))
+    stop2("An allele frequency must be specified")
+  if(!is.numeric(freq) || length(freq) != 1 || freq < 0 || freq > 1)
+    stop2("The allele frequency must be a single number between 0 and 1, inclusive")
+
 
   # Affection status vector, sorted along labs
   aff = logical(pedsize(x))
@@ -62,6 +84,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   # Proband marker
   genotype(mProband, proband) = c("a", "b")
+
 
   if(plot)
     plot(x, m, skip.empty = T, shaded = labs[aff], starred = proband)
