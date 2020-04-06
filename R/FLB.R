@@ -8,7 +8,8 @@
 #'   labels of pedigree members known to carry the variant in question.
 #' @param noncarriers A character vector (or coercible to such), containing the
 #'   ID labels of pedigree members known *not* to carry the variant in question.
-#' @param freq A single number; the allele frequency of the variant in question.
+#' @param freq A single number strictly between 0 and 1: the population
+#'   frequency of the obsverved allele.
 #' @param affected The affected pedigree members.
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both
@@ -66,8 +67,8 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   if(is.null(freq) || is.na(freq))
     stop2("An allele frequency must be specified")
-  if(!is.numeric(freq) || length(freq) != 1 || freq < 0 || freq > 1)
-    stop2("The allele frequency must be a single number between 0 and 1, inclusive")
+  if(!is.numeric(freq) || length(freq) != 1 || freq <= 0 || freq >= 1)
+    stop2("The allele frequency must be a single number strictly between 0 and 1")
 
 
   # Affection status vector, sorted along labs

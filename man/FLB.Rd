@@ -27,7 +27,8 @@ labels of pedigree members known to carry the variant in question.}
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
 
-\item{freq}{A single number; the allele frequency of the variant in question.}
+\item{freq}{A single number strictly between 0 and 1: the population
+frequency of the obsverved allele.}
 
 \item{affected}{The affected pedigree members.}
 
