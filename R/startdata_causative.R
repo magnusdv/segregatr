@@ -20,7 +20,7 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
     stop2("Illegal liability class: ", setdiff(liabilityClasses, 1:nrow(penetrances)))
 
   # Build genotype list in internal format
-  glist = pedprobr:::.buildGenolist(x, marker, eliminate = 1)
+  glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)
 
   if (attr(glist, "impossible")) {
     dat = structure(list(), impossible = TRUE)
@@ -37,9 +37,7 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
   # Allele frequencies (used in HW below)
   afr = afreq(marker)
 
-  # Initialise `impossible` attribute
-  impossible = FALSE
-
+  # Loop through individuals
   dat = lapply(1:pedsize(x), function(i) {
     h = glist[[i]]
 
@@ -67,13 +65,19 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
     if (any(zer)) {
       h = h[, !zer, drop = F]
       prob = prob[!zer]
-      if (all(zer))
-        impossible = TRUE
+      if (length(prob) == 0)
+        assign("impossible", TRUE, envir = parent.frame())
     }
-
     list(hap = h, prob = prob)
   })
 
+  # Add impossibility attribute
+  impossible = FALSE
+  for(dt in dat) if(!length(dt$prob)) {
+    impossible = TRUE
+    break
+  }
   attr(dat, "impossible") = impossible
+
   dat
 }
