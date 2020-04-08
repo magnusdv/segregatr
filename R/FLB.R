@@ -48,6 +48,8 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   if(length(proband) == 0 || proband == "")
     stop2("A proband must be specified")
+  if(!proband %in% labs)
+    stop2("The proband is not recognised as a pedigree member")
   if(!proband %in% affected)
     stop2("The proband must be affected")
   if(!proband %in% carriers)
