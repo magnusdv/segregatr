@@ -18,10 +18,10 @@
 #'   frame with 3 or more columns. Each row contains the penetrance values of a
 #'   liability class. The first three columns are interpreted as penetrance
 #'   values f0, f1, f2 respectively; additional columns are ignored.
-#' @param liabilityClasses A vector of length `pedsize(x)`, containing for each
+#' @param liability A vector of length `pedsize(x)`, containing for each
 #'   pedigree member the row number of `penetrances` which should be used for
 #'   that individual. (If `penetrances` is just a vector, it will be used for
-#'   all classes.) If `liabilityClasses` is NULL (the default), it is set to `1`
+#'   all classes.) If `liability` is NULL (the default), it is set to `1`
 #'   for all individuals.
 #' @param details A logical, indicating if detailed output should be returned.
 #' @param plot A logical.
@@ -39,7 +39,7 @@
 #' @export
 FLB = function(x, carriers, noncarriers = NULL, freq,
                affected, unknown = NULL, proband,
-               penetrances, liabilityClasses = NULL,
+               penetrances, liability = NULL,
                details = FALSE, plot = FALSE) {
 
   ### Note to self: Don't mess with the order of input checks.
@@ -91,6 +91,9 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   # Proband marker
   genotype(mProband, proband) = c("a", "b")
 
+  # Liability
+  if(is.null(liability))
+    liability = rep_len(1, pedsize(x))
 
   if(plot)
     plot(x, m, skipEmptyGenotypes = T, shaded = labs[aff], starred = proband)
@@ -98,7 +101,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   # Utility for setting up likelihood under causative hypothesis
   quickStart = function(locus)
     startdata_causative(x, marker = locus, aff = aff, penetrances = penetrances,
-                        liabilityClasses = liabilityClasses)
+                        liability = liability)
 
   # Main Bayes factor
   peelOrder = peelingOrder(x)

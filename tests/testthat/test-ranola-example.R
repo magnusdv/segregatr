@@ -34,7 +34,7 @@ test_that("Ranola's example pedigree evaluates correctly", {
           affected = 5:6,
           proband = 5,
           penetrances = PENET,
-          liabilityClasses = liab,
+          liability = liab,
           freq = 0.001,
           plot = F)
 

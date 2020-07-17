@@ -1,8 +1,7 @@
-startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = NULL) {
+
+startdata_causative = function(x, marker, aff, penetrances, liability = NULL) {
 
   # Penetrances
-  if(is.null(liabilityClasses))
-    liabilityClasses = rep_len(1, pedsize(x))
   if(is.null(dim(penetrances)))
     penetrances = as.data.frame(as.list(penetrances))
 
@@ -16,8 +15,8 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
   if(any(penetrances < 0 | penetrances > 1))
     stop2("All penetrance values must be between 0 and 1, inclusive")
 
-  if(!all(liabilityClasses %in% 1:nrow(penetrances)))
-    stop2("Illegal liability class: ", setdiff(liabilityClasses, 1:nrow(penetrances)))
+  if(!all(liability %in% 1:nrow(penetrances)))
+    stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetrances)))
 
   # Build genotype list in internal format
   glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)
@@ -42,7 +41,7 @@ startdata_causative = function(x, marker, aff, penetrances, liabilityClasses = N
     h = glist[[i]]
 
     # Penetrance values
-    liab = liabilityClasses[i]
+    liab = liability[i]
     penet = as.numeric(penetrances[liab, 1:3])
 
     # Affection status priors

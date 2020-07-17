@@ -13,7 +13,7 @@ FLB(
   unknown = NULL,
   proband,
   penetrances,
-  liabilityClasses = NULL,
+  liability = NULL,
   details = FALSE,
   plot = FALSE
 )
@@ -42,10 +42,10 @@ frame with 3 or more columns. Each row contains the penetrance values of a
 liability class. The first three columns are interpreted as penetrance
 values f0, f1, f2 respectively; additional columns are ignored.}
 
-\item{liabilityClasses}{A vector of length \code{pedsize(x)}, containing for each
+\item{liability}{A vector of length \code{pedsize(x)}, containing for each
 pedigree member the row number of \code{penetrances} which should be used for
 that individual. (If \code{penetrances} is just a vector, it will be used for
-all classes.) If \code{liabilityClasses} is NULL (the default), it is set to \code{1}
+all classes.) If \code{liability} is NULL (the default), it is set to \code{1}
 for all individuals.}
 
 \item{details}{A logical, indicating if detailed output should be returned.}
@@ -61,7 +61,10 @@ Computes the Bayes factor for co-segregation, as described by Thompson et al
 (2003).
 }
 \examples{
-FLB(pedtools::nuclearPed(2), carriers = 3:4, aff = 3:4, unknown = 1:2,
+
+x = nuclearPed(2)
+
+FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 
 }
