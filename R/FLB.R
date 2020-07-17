@@ -30,7 +30,10 @@
 #'   results is returned.
 #'
 #' @examples
-#' FLB(pedtools::nuclearPed(2), carriers = 3:4, aff = 3:4, unknown = 1:2,
+#'
+#' x = nuclearPed(2)
+#'
+#' FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
 #'     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 #'
 #' @export
@@ -90,7 +93,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
 
   if(plot)
-    plot(x, m, skip.empty = T, shaded = labs[aff], starred = proband)
+    plot(x, m, skipEmptyGenotypes = T, shaded = labs[aff], starred = proband)
 
   # Utility for setting up likelihood under causative hypothesis
   quickStart = function(locus)

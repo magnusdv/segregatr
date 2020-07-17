@@ -16,7 +16,8 @@ LazyData: true
 Suggests: 
     testthat (>= 2.1.0),
 Imports: 
-    pedtools,
     pedprobr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+Depends: 
+    pedtools
