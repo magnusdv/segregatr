@@ -1,34 +1,33 @@
 
 startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
-  # Build genotype list in internal format
-  glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)
-
-  if (attr(glist, "impossible")) {
-    dat = structure(list(), impossible = TRUE)
-    return(dat)
-  }
-
+  # Founder data
   FOU = founders(x, internal = TRUE)
-
-  # Founder inbreeding: A vector of length pedsize(x), with NA's at nonfounders
-  # Enables quick look-up e.g. FOU_INB[i].
   FOU_INB = rep(NA_real_, pedsize(x))
-  FOU_INB[FOU] = founderInbreeding(x)
+  FOU_INB[FOU] = founderInbreeding(x) # enable quick lookup
 
   # Allele frequencies (used in HW below)
   afr = afreq(marker)
 
+  # Build genotype list in internal format
+  glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)
+  impossible = attr(glist, "impossible")
+
   # Loop through individuals
   dat = lapply(1:pedsize(x), function(i) {
-    h = glist[[i]]
+
+    # If impossible, finish loop quickly (cannot use break in `apply()`)
+    if(impossible)
+      return(NULL)
+
+    g = glist[[i]]
 
     # Penetrance values
     liab = liability[i]
-    penet = as.numeric(penetrances[liab, 1:3])
+    penet = as.numeric(penetMat[liab, ])
 
     # Affection status priors
-    nmut = h[1, ] + h[2, ] - 2
+    nmut = g$pat + g$mat - 2
     affi = aff[i]
     if(is.na(affi))
       affpriors = rep_len(1, length(nmut))
@@ -37,29 +36,28 @@ startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
     else
       affpriors = 1 - penet[nmut + 1]
 
-    # Total genotype priors
+    # Add genotype priors
     prob = as.numeric(affpriors)
     if (i %in% FOU)
-      prob = prob * pedprobr::HWprob(h[1, ], h[2, ], afr, f = FOU_INB[i])
+      prob = prob * pedprobr::HWprob(g$pat, g$mat, afr, f = FOU_INB[i])
 
     # Remove impossible entries
-    zer = prob == 0
-    if (any(zer)) {
-      h = h[, !zer, drop = F]
-      prob = prob[!zer]
-      if (length(prob) == 0)
-        assign("impossible", TRUE, envir = parent.frame())
+    keep = prob > 0
+    if(!any(keep)) {
+      impossible = TRUE
+      return(NULL)
     }
-    list(hap = h, prob = prob)
+
+    if(!all(keep)) {
+      g$pat = g$pat[keep]
+      g$map = g$mat[keep]
+      prob = prob[keep]
+    }
+
+    g$prob = prob
+    g
   })
 
-  # Add impossibility attribute
-  impossible = FALSE
-  for(dt in dat) if(!length(dt$prob)) {
-    impossible = TRUE
-    break
-  }
   attr(dat, "impossible") = impossible
-
   dat
 }
