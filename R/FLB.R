@@ -14,16 +14,16 @@
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both
 #'   `carriers` and `affected`.
-#' @param penetrances Either a numeric vector of length 3 (f0, f1, f2) or a data
-#'   frame with 3 or more columns. Each row contains the penetrance values of a
-#'   liability class. The first three columns are interpreted as penetrance
-#'   values f0, f1, f2 respectively; additional columns are ignored.
+#' @param penetrances Either a numeric vector of length 3, corresponding to
+#'   `(f0, f1, f2)` or a matrix or data frame with 3 columns. Each row contains
+#'   the penetrance values of a liability class.
 #' @param liability A vector of length `pedsize(x)`, containing for each
 #'   pedigree member the row number of `penetrances` which should be used for
 #'   that individual. (If `penetrances` is just a vector, it will be used for
-#'   all classes.) If `liability` is NULL (the default), it is set to `1`
-#'   for all individuals.
-#' @param details A logical, indicating if detailed output should be returned.
+#'   all classes.) If `liability` is NULL (the default), it is set to `1` for
+#'   all individuals.
+#' @param details A logical, indicating if detailed output should be returned
+#'   (for debugging purposes).
 #' @param plot A logical.
 #'
 #' @return A positive number. If `details = TRUE`, a list of intermediate
@@ -91,16 +91,19 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   # Proband marker
   genotype(mProband, proband) = c("a", "b")
 
-  # Liability
-  if(is.null(liability))
-    liability = rep_len(1, pedsize(x))
+  # Penetrances and liability classes
+  penetMat = fixPenetrances(penetrances)
+  liability = liability %||% rep_len(1, pedsize(x))
+  if(!all(liability %in% 1:nrow(penetMat)))
+    stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetrances)))
+
 
   if(plot)
     plot(x, m, skipEmptyGenotypes = T, shaded = labs[aff], starred = proband)
 
   # Utility for setting up likelihood under causative hypothesis
   quickStart = function(locus)
-    startdata_causative(x, marker = locus, aff = aff, penetrances = penetrances,
+    startdata_causative(x, marker = locus, aff = aff, penetMat = penetMat,
                         liability = liability)
 
   # Main Bayes factor

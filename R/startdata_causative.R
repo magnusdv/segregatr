@@ -1,22 +1,5 @@
 
-startdata_causative = function(x, marker, aff, penetrances, liability = NULL) {
-
-  # Penetrances
-  if(is.null(dim(penetrances)))
-    penetrances = as.data.frame(as.list(penetrances))
-
-  if(ncol(penetrances) < 3)
-    stop2("Wrong format for the penetrance values. Please consult the documentation.")
-
-  penetrances = penetrances[, 1:3, drop = FALSE]
-
-  if(anyNA(penetrances))
-    stop2("Some penetrance values are missing")
-  if(any(penetrances < 0 | penetrances > 1))
-    stop2("All penetrance values must be between 0 and 1, inclusive")
-
-  if(!all(liability %in% 1:nrow(penetrances)))
-    stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetrances)))
+startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
   # Build genotype list in internal format
   glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)

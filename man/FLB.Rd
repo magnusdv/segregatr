@@ -37,18 +37,18 @@ frequency of the obsverved allele.}
 \item{proband}{The ID label of the proband. This person must also be in both
 \code{carriers} and \code{affected}.}
 
-\item{penetrances}{Either a numeric vector of length 3 (f0, f1, f2) or a data
-frame with 3 or more columns. Each row contains the penetrance values of a
-liability class. The first three columns are interpreted as penetrance
-values f0, f1, f2 respectively; additional columns are ignored.}
+\item{penetrances}{Either a numeric vector of length 3, corresponding to
+\verb{(f0, f1, f2)} or a matrix or data frame with 3 columns. Each row contains
+the penetrance values of a liability class.}
 
 \item{liability}{A vector of length \code{pedsize(x)}, containing for each
 pedigree member the row number of \code{penetrances} which should be used for
 that individual. (If \code{penetrances} is just a vector, it will be used for
-all classes.) If \code{liability} is NULL (the default), it is set to \code{1}
-for all individuals.}
+all classes.) If \code{liability} is NULL (the default), it is set to \code{1} for
+all individuals.}
 
-\item{details}{A logical, indicating if detailed output should be returned.}
+\item{details}{A logical, indicating if detailed output should be returned
+(for debugging purposes).}
 
 \item{plot}{A logical.}
 }
