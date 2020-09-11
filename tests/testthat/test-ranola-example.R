@@ -33,7 +33,7 @@ test_that("Ranola's example pedigree evaluates correctly", {
           noncarriers = c(7:10,12,13,16,19,20:21),
           affected = 5:6,
           proband = 5,
-          penetrances = PENET,
+          penetrances = PENET[1:3],
           liability = liab,
           freq = 0.001,
           plot = F)

@@ -10,14 +10,11 @@ q = 0.001
 # penetr = c(0, 1, 1)
 # q = 1e-15
 
-quickFLB = function(x, aff, unknown = NULL, carriers, noncarriers = NULL, proband, plot = F) {
-  m = marker(x, afreq = c(a = 1-q, b = q))
-  genotype(m, carriers) = c('a', 'b')
-  genotype(m, noncarriers) = c('a', 'a')
-  affvec = setNames(logical(pedsize(x)), labels(x))
-  affvec[as.character(aff)] = T
-  affvec[as.character(unknown)] = NA
-  res = FLB(x, marker = m, aff = affvec, proband = proband, penetrances = penetr, plot = plot)
+quickFLB = function(x, aff, unknown = NULL, carriers, noncarriers = NULL,
+                    proband, plot = F) {
+  res = FLB(x, affected = aff, freq = q, unknown = unknown,
+            carriers = carriers, noncarriers = noncarriers,
+            proband = proband, penetrances = penetr, plot = plot)
   # print(res)
   res[[1]][["FLB"]]
 }

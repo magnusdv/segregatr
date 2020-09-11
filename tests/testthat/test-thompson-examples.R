@@ -3,7 +3,7 @@
 PENETR = c(0.05, 0.7, 0.7)
 
 test_that("Thompson's results for Pedigree 1 are correct", {
-  x = relabel(swapSex(cousinPed(1), c(3,8)), old = c(4,3,6,7,5,8), new = 3:8)
+  x = relabel(swapSex(cousinPed(1), c(3,8)), "asPlot")
 
   quickFLB = function(carr, noncarr = NULL, aff, unkn = NULL) {
     bf = FLB(x, carriers = carr, noncarriers = noncarr,
