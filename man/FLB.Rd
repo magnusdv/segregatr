@@ -15,7 +15,8 @@ FLB(
   penetrances,
   liability = NULL,
   details = FALSE,
-  plot = FALSE
+  plot = FALSE,
+  ...
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ all individuals.}
 (for debugging purposes).}
 
 \item{plot}{A logical.}
+
+\item{...}{Optional plot parameters passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 }
 \value{
 A positive number. If \code{details = TRUE}, a list of intermediate

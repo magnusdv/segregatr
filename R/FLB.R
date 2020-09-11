@@ -25,6 +25,7 @@
 #' @param details A logical, indicating if detailed output should be returned
 #'   (for debugging purposes).
 #' @param plot A logical.
+#' @param ... Optional plot parameters passed on to [pedtools::plot.ped()].
 #'
 #' @return A positive number. If `details = TRUE`, a list of intermediate
 #'   results is returned.
@@ -40,7 +41,7 @@
 FLB = function(x, carriers, noncarriers = NULL, freq,
                affected, unknown = NULL, proband,
                penetrances, liability = NULL,
-               details = FALSE, plot = FALSE) {
+               details = FALSE, plot = FALSE, ...) {
 
   ### Note to self: Don't mess with the order of input checks.
 
@@ -52,7 +53,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   if(length(proband) == 0 || proband == "")
     stop2("A proband must be specified")
   if(!proband %in% labs)
-    stop2("The proband is not recognised as a pedigree member")
+    stop2("Unknown proband: ", proband)
   if(!proband %in% affected)
     stop2("The proband must be affected")
   if(!proband %in% carriers)
@@ -65,16 +66,19 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   }
 
   if(length(err1 <- intersect(affected, unknown)))
-    stop2(sprintf("Individual %s cannot be both *affected* and *unknown*", err1[1]))
+    stop2("Individual specified as both affected and unknown: ", err1)
 
   if(length(err2 <- intersect(carriers, noncarriers)))
-    stop2(sprintf("Individual %s cannot be both a *carrier* and a *non-carrier*", err2[1]))
+    stop2("Individual specified as both a carrier and a non-carrier: ", err2)
 
   if(is.null(freq) || is.na(freq))
     stop2("An allele frequency must be specified")
   if(!is.numeric(freq) || length(freq) != 1 || freq <= 0 || freq >= 1)
     stop2("The allele frequency must be a single number strictly between 0 and 1")
 
+  if(plot) {
+    plotPedDetails(x, affected, unknown, proband, carriers, noncarriers, ...)
+  }
 
   # Affection status vector, sorted along labs
   aff = logical(pedsize(x))
@@ -98,21 +102,21 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetrances)))
 
 
-  if(plot)
-    plot(x, m, skipEmptyGenotypes = T, shaded = labs[aff], starred = proband)
-
-  # Utility for setting up likelihood under causative hypothesis
-  quickStart = function(locus)
-    startdata_causative(x, marker = locus, aff = aff, penetMat = penetMat,
-                        liability = liability)
-
-  # Main Bayes factor
+  # Setup for likelihood under causal hypothesis
   peelOrder = peelingOrder(x)
-  setup1 = list(informativeNucs = peelOrder, startdata = quickStart(m))
-  numer1 = likelihood(x, m, setup = setup1)
+  peeler = pedprobr:::.peel_M_AUT
+  peelingProcess = pedprobr:::peelingProcess
 
-  setupDis = list(informativeNucs = peelOrder, startdata = quickStart(dis))
-  likDis = likelihood(x, dis, setup = setupDis)
+  startCausal = function(x, locus)
+    startdata_causative(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+
+  likelihoodCausal = function(x, locus) {
+    peelingProcess(x, locus, startdata = startCausal,
+                   peeler = peeler, peelOrder = peelOrder)
+  }
+  # Main Bayes factor
+  numer1 = likelihoodCausal(x, m)
+  likDis = likelihoodCausal(x, dis)
   likM = likelihood(x, m)
 
   denom1 = likDis * likM
@@ -122,8 +126,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   likMproband = likelihood(x, mProband)
   numer2 = likDis * likMproband
 
-  setup2 = list(informativeNucs = peelOrder, startdata = quickStart(mProband))
-  denom2 = likelihood(x, mProband, setup = setup2)
+  denom2 = likelihoodCausal(x, mProband)
 
   BF2 = numer2/denom2
 
