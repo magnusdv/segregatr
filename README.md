@@ -7,15 +7,16 @@
 
 <!-- badges: end -->
 
-The goal of segregatr is to provide segregation analysis for clinical
-variant classification.
+The goal of **segregatr** is to provide segregation analysis for
+clinical variant classification.
 
 ## Installation
 
-You can install the development version of segregatr from GitHub with:
+You can install the development version of **segregatr** from GitHub
+with:
 
 ``` r
-# install.packages("devtools") # if devtools is not already installed
+# install.packages("devtools")
 devtools::install_github("magnusdv/segregatr")
 ```
 

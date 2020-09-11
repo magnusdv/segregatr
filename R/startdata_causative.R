@@ -50,7 +50,7 @@ startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
     if(!all(keep)) {
       g$pat = g$pat[keep]
-      g$map = g$mat[keep]
+      g$mat = g$mat[keep]
       prob = prob[keep]
     }
 
