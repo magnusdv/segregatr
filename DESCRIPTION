@@ -7,17 +7,23 @@ Authors@R:
            role = c("aut", "cre"),
            email = "m.d.vigeland@medisin.uio.no",
            comment = c(ORCID = "0000-0002-9134-4962"))
-Description: Computation of Bayes factors for evaluating segregation evidence
-    for pathogenicity of a genetic variant. 
+Description: An implementation of the full-likelihood Bayes factor (FLB) 
+    for evaluating segregation evidence in clinical medical genetics. The method 
+    was introduced by Thompson et al. (2003) <doi:10.1086/378100>, and further 
+    popularised by Bayrak-Toydemir et al. (2008) <doi:10.1016/j.yexmp.2008.03.006>.
+    This implementation allows custom penetrance values and liability classes, and 
+    includes specialised pedigree visualisations.
 License: GPL-3
+URL: https://github.com/magnusdv/segregatr
+BugReports: https://github.com/magnusdv/segregatr/issues
 Encoding: UTF-8
 Language: en-GB
-LazyData: true
-Suggests: 
-    testthat (>= 2.1.0),
-Imports: 
-    pedprobr
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
 Depends: 
     pedtools
+Imports: 
+    pedprobr
+Suggests: 
+    testthat (>= 2.1.0)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+
