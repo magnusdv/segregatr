@@ -1,7 +1,21 @@
+#' Pedigree plot for segregation analysis
+#'
+#' Plots a pedigree showing the segregation of a variant.
+#'
+#' @inheritParams FLB
+#' @param cex,margins Arguments passed on to [pedtools::plot.ped()].
+#'
+#' @examples
+#'
+#' x = nuclearPed(2)
+#' plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3,
+#'                 carriers = 3:4, margins = c(1,3,1,1))
+#'
 #' @importFrom graphics arrows strheight text
-plotPedDetails = function(x, affected = NULL, unknown = NULL, proband = NULL,
-                          carriers = NULL, noncarriers = NULL, cex = 1,
-                          margins = rep(1, 4), ...) {
+#' @export
+plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
+                           carriers = NULL, noncarriers = NULL, cex = 1,
+                           margins = rep(1, 4), ...) {
 
   # Input checks
   allids = c(proband, affected, unknown, carriers, noncarriers)

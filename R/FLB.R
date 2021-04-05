@@ -80,7 +80,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     stop2("The allele frequency must be a single number strictly between 0 and 1")
 
   if(plot) {
-    plotPedDetails(x, affected, unknown, proband, carriers, noncarriers, ...)
+    plotSegregation(x, affected, unknown, proband, carriers, noncarriers, ...)
   }
 
   # Affection status vector, sorted along labs
