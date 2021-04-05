@@ -27,6 +27,9 @@
 #' @param plot A logical.
 #' @param ... Optional plot parameters passed on to [pedtools::plot.ped()].
 #'
+#' @references Thompson D, Easton DF, Goldgar DE. *A full-likelihood method for
+#'   the evaluation of causality of sequence variants from family data.* Am J
+#'   Hum Genet, 2003. \doi{10.1086/378100}.
 #' @return A positive number. If `details = TRUE`, a list of intermediate
 #'   results is returned.
 #'
