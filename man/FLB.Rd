@@ -71,3 +71,8 @@ FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 
 }
+\references{
+Thompson D, Easton DF, Goldgar DE. \emph{A full-likelihood method for
+the evaluation of causality of sequence variants from family data.} Am J
+Hum Genet, 2003. \doi{10.1086/378100}.
+}
