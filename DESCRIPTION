@@ -1,5 +1,5 @@
 Package: segregatr
-Title: Segregation Analysis for Variant Classification
+Title: Segregation Analysis for Variant Interpretation
 Version: 0.2.0
 Authors@R: 
     person(given = "Magnus Dehli",
