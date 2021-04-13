@@ -1,6 +1,6 @@
 Package: segregatr
-Title: Segregation Analysis for Variant Pathogenicity Classification
-Version: 0.1.0
+Title: Segregation Analysis for Variant Classification
+Version: 0.2.0
 Authors@R: 
     person(given = "Magnus Dehli",
            family = "Vigeland",
