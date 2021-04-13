@@ -1,15 +1,15 @@
 #' Full-likelihood Bayes factor
 #'
-#' Computes the Bayes factor for co-segregation, as described by Thompson et al
+#' Computes the Bayes factor for co-segregation, as described by Thompson et al.
 #' (2003).
 #'
-#' @param x A `ped` object
+#' @param x A [pedtools::ped()] object.
 #' @param carriers A character vector (or coercible to such), containing the ID
 #'   labels of pedigree members known to carry the variant in question.
 #' @param noncarriers A character vector (or coercible to such), containing the
 #'   ID labels of pedigree members known *not* to carry the variant in question.
 #' @param freq A single number strictly between 0 and 1: the population
-#'   frequency of the obsverved allele.
+#'   frequency of the observed allele.
 #' @param affected The affected pedigree members.
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both

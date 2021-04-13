@@ -17,7 +17,7 @@ plotSegregation(
 )
 }
 \arguments{
-\item{x}{A \code{ped} object}
+\item{x}{A \code{\link[pedtools:ped]{pedtools::ped()}} object.}
 
 \item{affected}{The affected pedigree members.}
 

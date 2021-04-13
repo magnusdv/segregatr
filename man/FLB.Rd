@@ -20,7 +20,7 @@ FLB(
 )
 }
 \arguments{
-\item{x}{A \code{ped} object}
+\item{x}{A \code{\link[pedtools:ped]{pedtools::ped()}} object.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
 labels of pedigree members known to carry the variant in question.}
@@ -29,7 +29,7 @@ labels of pedigree members known to carry the variant in question.}
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
 
 \item{freq}{A single number strictly between 0 and 1: the population
-frequency of the obsverved allele.}
+frequency of the observed allele.}
 
 \item{affected}{The affected pedigree members.}
 
@@ -60,7 +60,7 @@ A positive number. If \code{details = TRUE}, a list of intermediate
 results is returned.
 }
 \description{
-Computes the Bayes factor for co-segregation, as described by Thompson et al
+Computes the Bayes factor for co-segregation, as described by Thompson et al.
 (2003).
 }
 \examples{
