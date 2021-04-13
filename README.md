@@ -11,20 +11,27 @@ clinical variant classification.
 
 ## Installation
 
-You can install the development version of **segregatr** from GitHub
-with:
+You can install **segregatr** from CRAN as follows:
 
 ``` r
-# install.packages("devtools")
+install.packages("segregatr")
+```
+
+Alternatively, you can obtain the latest development version from
+GitHub:
+
+``` r
 devtools::install_github("magnusdv/segregatr")
 ```
+
+## Example
+
+We start by loading **segregatr**:
 
 ``` r
 library(segregatr)
 #> Loading required package: pedtools
 ```
-
-## Example
 
 The family below shows four brothers, all affected with a rare dominant
 disease with 90% penetrance and phenocopy rate 1%. The parents have
