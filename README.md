@@ -4,6 +4,11 @@
 # segregatr
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/segregatr)](https://CRAN.R-project.org/package=segregatr)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/segregatr?color=yellow)](https://cran.r-project.org/package=segregatr)
+[![](https://cranlogs.r-pkg.org/badges/last-month/segregatr?color=yellow)](https://cran.r-project.org/package=segregatr)
 <!-- badges: end -->
 
 The goal of **segregatr** is to provide segregation analysis for
@@ -39,7 +44,7 @@ unknown affection status. All four brothers are shown to carry a
 candidate variant, warranting a segregation analysis. pathogenic
 variant.
 
-<img src="man/figures/README-sibex-1.png" width="40%" />
+<img src="man/figures/README-sibex-1.png" width="35%" style="display: block; margin: auto;" />
 
 In order to compute the full-likelihood Bayes factor, we first create
 the pedigree.

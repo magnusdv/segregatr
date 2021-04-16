@@ -16,6 +16,9 @@ knitr::opts_chunk$set(
 # segregatr
 
 <!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/segregatr)](https://CRAN.R-project.org/package=segregatr)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/segregatr?color=yellow)](https://cran.r-project.org/package=segregatr)
+[![](https://cranlogs.r-pkg.org/badges/last-month/segregatr?color=yellow)](https://cran.r-project.org/package=segregatr)
 <!-- badges: end -->
 
 The goal of **segregatr** is to provide segregation analysis for clinical variant classification.
@@ -42,7 +45,7 @@ library(segregatr)
 
 The family below shows four brothers, all affected with a rare dominant disease with 90% penetrance and phenocopy rate 1%. The parents have unknown affection status. All four brothers are shown to carry a candidate variant, warranting a segregation analysis. pathogenic variant.
 
-```{r sibex, echo = F, results = F, fig.height = 2.5, fig.width = 3, out.width = "40%"}
+```{r sibex, echo = F, results = F, fig.height = 2.5, fig.width = 3, fig.align='center', out.width = "35%"}
 x = nuclearPed(4)
 plotSegregation(x, affected = 3:6, unknown = 1:2L, proband = 3,
                 carriers = 3:6, margins = c(1,3,1,1))
