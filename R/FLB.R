@@ -22,6 +22,9 @@
 #'   that individual. (If `penetrances` is just a vector, it will be used for
 #'   all classes.) If `liability` is NULL (the default), it is set to `1` for
 #'   all individuals.
+#' @param loopBreakers (Relevant only if `x` has loops.) A vector of ID labels
+#'   indicating loop breakers. The default value (NULL) initiates automatic loop
+#'   breaking, which is recommended in most cases.
 #' @param details A logical, indicating if detailed output should be returned
 #'   (for debugging purposes).
 #' @param plot A logical.
@@ -43,13 +46,16 @@
 #' @export
 FLB = function(x, carriers, noncarriers = NULL, freq,
                affected, unknown = NULL, proband,
-               penetrances, liability = NULL,
+               penetrances, liability = NULL, loopBreakers = NULL,
                details = FALSE, plot = FALSE, ...) {
 
   ### Note to self: Don't mess with the order of input checks.
 
   if(!is.ped(x))
     stop2("The first argument must be a `ped` object")
+
+  if(!is.null(x$LOOP_BREAKERS))
+    stop2("Pedigrees with pre-broken loops are not allowed as input to `FLB()`")
 
   labs = labels(x)
 
@@ -83,12 +89,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     plotSegregation(x, affected, unknown, proband, carriers, noncarriers, ...)
   }
 
-  # Affection status vector, sorted along labs
-  aff = logical(pedsize(x))
-  aff[internalID(x, affected)] = TRUE
-  aff[internalID(x, unknown)] = NA
-
-  # Empty marker (= disease locus)
+  # Empty marker and disease locus)
   dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq))
 
   # Full marker
@@ -97,6 +98,38 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   # Proband marker
   genotype(mProband, proband) = c("a", "b")
+
+  # Break loops if necessary
+  if(hasUnbrokenLoops(x)) {
+    x = breakLoops(setMarkers(x, list(dis, m, mProband)), loopBreakers = loopBreakers, verbose = FALSE)
+
+    # Extract updated markers
+    dis = x$MARKERS[[1]]
+    m = x$MARKERS[[2]]
+    mProband = x$MARKERS[[3]]
+
+    # Add duplicates to input vectors, were needed
+    lb = x$ID[x$LOOP_BREAKERS[, 'orig']]
+
+    if(length(lbAff <- intersect(affected, lb)))
+      affected = unique.default(c(affected, paste0("=", lbAff)))
+
+    if(length(lbUn <- intersect(unknown, lb)))
+      unknown = unique.default(c(unknown, paste0("=", lbUn)))
+
+    # TODO: Fix this (easy)
+    if(!is.null(liability))
+      stop2("Liability classes are not yet implemented when `x` has loops")
+
+    # TODO: Handle proband vs loop breaking better
+    if(proband %in% lb)
+      stop2("The proband cannot be a loop breaker; please select different loop breaker(s)")
+  }
+
+  # Affection status vector, sorted along labs
+  aff = logical(pedsize(x))
+  aff[internalID(x, affected)] = TRUE
+  aff[internalID(x, unknown)] = NA
 
   # Penetrances and liability classes
   penetMat = fixPenetrances(penetrances)

@@ -14,6 +14,7 @@ FLB(
   proband,
   penetrances,
   liability = NULL,
+  loopBreakers = NULL,
   details = FALSE,
   plot = FALSE,
   ...
@@ -47,6 +48,10 @@ pedigree member the row number of \code{penetrances} which should be used for
 that individual. (If \code{penetrances} is just a vector, it will be used for
 all classes.) If \code{liability} is NULL (the default), it is set to \code{1} for
 all individuals.}
+
+\item{loopBreakers}{(Relevant only if \code{x} has loops.) A vector of ID labels
+indicating loop breakers. The default value (NULL) initiates automatic loop
+breaking, which is recommended in most cases.}
 
 \item{details}{A logical, indicating if detailed output should be returned
 (for debugging purposes).}
