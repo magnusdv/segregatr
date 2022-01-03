@@ -5,7 +5,9 @@
 #'
 #' @param x A [pedtools::ped()] object.
 #' @param carriers A character vector (or coercible to such), containing the ID
-#'   labels of pedigree members known to carry the variant in question.
+#'   labels of pedigree members known to carry one copy of the variant in question.
+#' @param homozygous A character vector (or coercible to such), containing the ID
+#'   labels of pedigree members known to carry two copies of the variant in question.
 #' @param noncarriers A character vector (or coercible to such), containing the
 #'   ID labels of pedigree members known *not* to carry the variant in question.
 #' @param freq A single number strictly between 0 and 1: the population
@@ -25,6 +27,7 @@
 #' @param loopBreakers (Relevant only if `x` has loops.) A vector of ID labels
 #'   indicating loop breakers. The default value (NULL) initiates automatic loop
 #'   breaking, which is recommended in most cases.
+#' @param Xchrom A logical, indicating if a model of X-linked inheritance should be applied.
 #' @param details A logical, indicating if detailed output should be returned
 #'   (for debugging purposes).
 #' @param plot A logical.
@@ -44,9 +47,9 @@
 #'     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 #'
 #' @export
-FLB = function(x, carriers, noncarriers = NULL, freq,
+FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
                affected, unknown = NULL, proband,
-               penetrances, liability = NULL, loopBreakers = NULL,
+               penetrances, liability = NULL, loopBreakers = NULL, Xchrom = FALSE,
                details = FALSE, plot = FALSE, ...) {
 
   ### Note to self: Don't mess with the order of input checks.
@@ -58,6 +61,7 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     stop2("Pedigrees with pre-broken loops are not allowed as input to `FLB()`")
 
   labs = labels(x)
+  males = which(x$SEX==1)
 
   if(length(proband) == 0 || proband == "")
     stop2("A proband must be specified")
@@ -65,10 +69,10 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     stop2("Unknown proband: ", proband)
   if(!proband %in% affected)
     stop2("The proband must be affected")
-  if(!proband %in% carriers)
+  if(!proband %in% c(carriers, homozygous))
     stop2("The proband must be a carrier")
 
-  for(ids in list(proband, affected, unknown, carriers, noncarriers)) {
+  for(ids in list(proband, affected, unknown, carriers, homozygous, noncarriers)) {
     validID = ids %in% labs
     if(!all(validID))
       stop2("Unknown ID label: ", ids[!validID])
@@ -77,8 +81,14 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
   if(length(err1 <- intersect(affected, unknown)))
     stop2("Individual specified as both affected and unknown: ", err1)
 
-  if(length(err2 <- intersect(carriers, noncarriers)))
+  if(length(err2 <- intersect(c(carriers, homozygous), noncarriers)))
     stop2("Individual specified as both a carrier and a non-carrier: ", err2)
+
+  if(length(err3 <- intersect(carriers, homozygous)))
+    stop2("Individual specified as both heterozygous and homozygous carrier: ", err3)
+
+  if(Xchrom & length(err4 <- intersect(males, homozygous)))
+    stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err4)
 
   if(is.null(freq) || is.na(freq))
     stop2("An allele frequency must be specified")
@@ -86,18 +96,26 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
     stop2("The allele frequency must be a single number strictly between 0 and 1")
 
   if(plot) {
-    plotSegregation(x, affected, unknown, proband, carriers, noncarriers, ...)
+    plotSegregation(x, affected, unknown, proband, carriers, homozygous, noncarriers, ...)
   }
 
   # Empty marker and disease locus)
-  dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq))
+  dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq), chrom = ifelse(Xchrom, 'X', NA))
 
   # Full marker
-  genotype(m, carriers) = c("a", "b")
-  genotype(m, noncarriers) = c("a", "a")
+  if (Xchrom) {
+    genotype(m, intersect(carriers, males)) = "b"
+    genotype(m, setdiff(carriers, males)) = c("a", "b")
+    genotype(m, intersect(noncarriers, males)) = "a"
+    genotype(m, setdiff(noncarriers, males)) = c("a", "a")
+  } else {
+    genotype(m, carriers) = c("a", "b")
+    genotype(m, noncarriers) = c("a", "a")
+  }
+  genotype(m, homozygous) = c("b", "b")
 
   # Proband marker
-  genotype(mProband, proband) = c("a", "b")
+  genotype(mProband, proband) = genotype(m, proband)
 
   # Break loops if necessary
   if(hasUnbrokenLoops(x)) {
@@ -140,15 +158,20 @@ FLB = function(x, carriers, noncarriers = NULL, freq,
 
   # Setup for likelihood under causal hypothesis
   peelOrder = peelingOrder(x)
-  peeler = pedprobr:::.peel_M_AUT
   peelingProcess = pedprobr:::peelingProcess
 
-  startCausal = function(x, locus)
-    startdata_causative(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+  if (Xchrom) {
+    peeler = function(x, locus) function(dat, sub) pedprobr:::.peel_M_X(dat, sub, SEX = x$SEX)
+    startCausal = function(x, locus) startdata_causative_X(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+  }
+  else {
+    peeler = function(x, locus) function(dat, sub) pedprobr:::.peel_M_AUT(dat, sub)
+    startCausal = function(x, locus) startdata_causative(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+  }
 
   likelihoodCausal = function(x, locus) {
     peelingProcess(x, locus, startdata = startCausal,
-                   peeler = peeler, peelOrder = peelOrder)
+                   peeler = peeler(x, locus), peelOrder = peelOrder)
   }
   # Main Bayes factor
   numer1 = likelihoodCausal(x, m)

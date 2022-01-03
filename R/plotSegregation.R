@@ -14,7 +14,7 @@
 #' @importFrom graphics arrows strheight text
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
-                           carriers = NULL, noncarriers = NULL, cex = 1,
+                           carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
                            margins = rep(1, 4), ...) {
 
   # Input checks
@@ -40,6 +40,9 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
 
   if(!is.null(carriers))
     text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+
+  if(!is.null(homozygous))
+    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = 3, offset = 0)
 
   if(!is.null(noncarriers))
     text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = 3, offset = 0)
