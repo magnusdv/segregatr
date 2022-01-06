@@ -22,27 +22,43 @@ startdata_causative_X = function(x, marker, aff, penetMat, liability = NULL) {
 
     g = glist[[i]]
 
-    # Penetrance values
+    # Liability class
     liab = liability[i]
-    penet = as.numeric(penetMat[liab, ])
 
-    # Affection status priors
-    if (x$SEX[i] == 1)
-      nmut = 2*g$mat - 2
-    else
+    if (x$SEX[i] == 1) {
+      # Penetrance values (males)
+      penet = as.numeric(penetMat$male[liab, ])
+      # Affection status priors
+      nmut = g$mat - 1
+      affi = aff[i]
+      if(is.na(affi))
+        affpriors = rep_len(1, length(nmut))
+      else if(affi)
+        affpriors = penet[nmut + 1]
+      else
+        affpriors = 1 - penet[nmut + 1]
+      # Add genotype priors
+      prob = as.numeric(affpriors)
+      if (i %in% FOU)
+        prob = prob * afr[g$mat]
+    }
+    else {
+      # Penetrance values (females)
+      penet = as.numeric(penetMat$female[liab, ])
+      # Affection status priors
       nmut = g$pat + g$mat - 2
-    affi = aff[i]
-    if(is.na(affi))
-      affpriors = rep_len(1, length(nmut))
-    else if(affi)
-      affpriors = penet[nmut + 1]
-    else
-      affpriors = 1 - penet[nmut + 1]
-
-    # Add genotype priors
-    prob = as.numeric(affpriors)
-    if (i %in% FOU)
-      prob = prob * switch(x$SEX[i], afr[g$mat], pedprobr::HWprob(g$pat, g$mat, afr, f = FOU_INB[i]))
+      affi = aff[i]
+      if(is.na(affi))
+        affpriors = rep_len(1, length(nmut))
+      else if(affi)
+        affpriors = penet[nmut + 1]
+      else
+        affpriors = 1 - penet[nmut + 1]
+      # Add genotype priors
+      prob = as.numeric(affpriors)
+      if (i %in% FOU)
+        prob = prob * pedprobr::HWprob(g$pat, g$mat, afr, f = FOU_INB[i])
+    }
 
     # Remove impossible entries
     keep = prob > 0

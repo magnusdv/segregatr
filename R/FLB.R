@@ -16,14 +16,9 @@
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both
 #'   `carriers` and `affected`.
-#' @param penetrances Either a numeric vector of length 3, corresponding to
-#'   `(f0, f1, f2)` or a matrix or data frame with 3 columns. Each row contains
-#'   the penetrance values of a liability class.
-#' @param liability A vector of length `pedsize(x)`, containing for each
-#'   pedigree member the row number of `penetrances` which should be used for
-#'   that individual. (If `penetrances` is just a vector, it will be used for
-#'   all classes.) If `liability` is NULL (the default), it is set to `1` for
-#'   all individuals.
+#' @param penetrances For autosomal models, a numeric vector of length 3, corresponding to `(f0, f1, f2)`. It can also be a matrix or data frame with 3 columns where each row contains the penetrance values of a liability class.
+#'   For X-linked models, a list of two numeric vectors named `male` and `female`, of lengths 2 `(f0, f1)` and 3 `(f0, f1, f2)` respectively. Alternatively, each list entry may be a matrix or data frame (with the same number of columns) where each row represents a liability class.
+#' @param liability A vector of length `pedsize(x)`, containing for each pedigree member the row number of `penetrances` which should be used for that individual. (If `penetrances` is just a vector (or one for each sex in X-linked models), it will be used for all classes.) If `liability` is NULL (the default), it is set to `1` for all individuals.
 #' @param loopBreakers (Relevant only if `x` has loops.) A vector of ID labels
 #'   indicating loop breakers. The default value (NULL) initiates automatic loop
 #'   breaking, which is recommended in most cases.
@@ -42,9 +37,18 @@
 #' @examples
 #'
 #' x = nuclearPed(2)
-#'
 #' FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
 #'     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
+#'
+#' x = nuclearPed(4)
+#' FLB(x, carriers = 4:5, homozygous = 3, noncarriers = 6, aff = 3, unknown = 1:2,
+#'     freq = 0.0001, penetrances = c(0.01, 0.01, 0.99), proband = 3)
+#'
+#' x = nuclearPed(3, sex = c(1, 1, 2))
+#' x = addChildren(x, mo = 5, sex = 1:2)
+#' FLB(x, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
+#'     freq = 0.0001, penetrances = list(male = c(0, 1), female = c(0, 0, 1)),
+#'     proband = 7, Xchrom = TRUE)
 #'
 #' @export
 FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
@@ -90,7 +94,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   if(Xchrom & length(err4 <- intersect(males, homozygous)))
     stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err4)
 
-  if(is.null(freq) || is.na(freq))
+  if(missing(freq) || is.na(freq))
     stop2("An allele frequency must be specified")
   if(!is.numeric(freq) || length(freq) != 1 || freq <= 0 || freq >= 1)
     stop2("The allele frequency must be a single number strictly between 0 and 1")
@@ -103,7 +107,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq), chrom = ifelse(Xchrom, 'X', NA))
 
   # Full marker
-  if (Xchrom) {
+  if(Xchrom) {
     genotype(m, intersect(carriers, males)) = "b"
     genotype(m, setdiff(carriers, males)) = c("a", "b")
     genotype(m, intersect(noncarriers, males)) = "a"
@@ -149,18 +153,45 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   aff[internalID(x, affected)] = TRUE
   aff[internalID(x, unknown)] = NA
 
-  # Penetrances and liability classes
-  penetMat = fixPenetrances(penetrances)
-  liability = liability %||% rep_len(1, pedsize(x))
-  if(!all(liability %in% 1:nrow(penetMat)))
-    stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetrances)))
+  # Penetrances
+  if(missing(penetrances))
+    stop2("No penetrance values given")
+
+  if(Xchrom) {
+    if(!isTRUE(is.list(penetrances) && setequal(names(penetrances), c("male", "female"))))
+      stop2("For X-linked models, `penetrances` must be a list with elements `male` and `female`")
+    penetMat = list(male = fixPenetrances(penetrances$male, maleX = TRUE),
+                    female = fixPenetrances(penetrances$female, maleX = FALSE))
+  }
+  else {
+    penetMat = fixPenetrances(penetrances)
+  }
+
+  # Liability classes
+  if(is.null(liability))
+    liability = rep_len(1, pedsize(x))
+  else if(length(liability) != pedsize(x))
+    stop2("Pedigree size (", pedsize(x), ") and assigned liability classes (", length(liability), ") must be equal")
+
+  if(Xchrom) {
+    ilc_male = setdiff(liability[males], 1:nrow(penetMat$male))
+    ilc_female = setdiff(liability[-males], 1:nrow(penetMat$female))
+    if(length(ilc_male) | length(ilc_female))
+      stop2("Illegal liability class:",
+            if(length(ilc_male)) c(paste(" male", ilc_male[1]), ilc_male[-1]),
+            if(length(ilc_male) & length(ilc_female)) ";",
+            if(length(ilc_female)) c(paste(" female", ilc_female[1]), ilc_female[-1]))
+  }
+  else
+    if(!all(liability %in% 1:nrow(penetMat)))
+      stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetMat)))
 
 
   # Setup for likelihood under causal hypothesis
   peelOrder = peelingOrder(x)
   peelingProcess = pedprobr:::peelingProcess
 
-  if (Xchrom) {
+  if(Xchrom) {
     peeler = function(x, locus) function(dat, sub) pedprobr:::.peel_M_X(dat, sub, SEX = x$SEX)
     startCausal = function(x, locus) startdata_causative_X(x, locus, aff = aff, penetMat = penetMat, liability = liability)
   }
@@ -173,6 +204,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
     peelingProcess(x, locus, startdata = startCausal,
                    peeler = peeler(x, locus), peelOrder = peelOrder)
   }
+
   # Main Bayes factor
   numer1 = likelihoodCausal(x, m)
   likDis = likelihoodCausal(x, dis)
@@ -192,7 +224,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   FLB = BF1 * BF2
 
   if(details)
-    return(list(c(FLB = FLB, BF1 = BF1, BF2 = BF2),
+    return(list(c(FLB = FLB, BF1 = BF1, `1/BF2` = BF2),
                 c(numer1 = numer1, denom1 = denom1, numer2 = numer2, denom2 = denom2),
                 c(likM = likM, likMproband = likMproband, likDis = likDis)))
   FLB
