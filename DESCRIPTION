@@ -7,6 +7,10 @@ Authors@R:
            role = c("aut", "cre"),
            email = "m.d.vigeland@medisin.uio.no",
            comment = c(ORCID = "0000-0002-9134-4962"))
+    person(given = "Christian",
+           family = "Carrizosa",
+           role = "aut",
+           comment = c(ORCID = "0000-0002-3919-0011"))
 Description: An implementation of the full-likelihood Bayes factor (FLB) 
     for evaluating segregation evidence in clinical medical genetics. The method 
     was introduced by Thompson et al. (2003) <doi:10.1086/378100>, and further 
