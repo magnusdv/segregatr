@@ -91,7 +91,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   if(length(err3 <- intersect(carriers, homozygous)))
     stop2("Individual specified as both heterozygous and homozygous carrier: ", err3)
 
-  if(Xchrom & length(err4 <- intersect(males, homozygous)))
+  if(Xchrom && length(err4 <- intersect(males, homozygous)))
     stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err4)
 
   if(missing(freq) || is.na(freq))
@@ -179,7 +179,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
     if(length(ilc_male) | length(ilc_female))
       stop2("Illegal liability class:",
             if(length(ilc_male)) c(paste(" male", ilc_male[1]), ilc_male[-1]),
-            if(length(ilc_male) & length(ilc_female)) ";",
+            if(length(ilc_male) && length(ilc_female)) ";",
             if(length(ilc_female)) c(paste(" female", ilc_female[1]), ilc_female[-1]))
   }
   else
