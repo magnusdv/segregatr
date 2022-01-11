@@ -28,7 +28,16 @@ test_that("Results for FLB() Example 1 are correct", {
     1*2*a*b * 1*a^2 * f[l[3],2]*0.5 * f[l[4],2]*0.5 + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],2]*0.5 * f[l[4],2]*0.5 + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],2]*0.5 * f[l[4],2]*0.5   # 1=a/b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'a/b', `4` = 'a/b', afreq = c('b' = b, 'a' = a))))
+  likM =
+    a^2 * a^2 * 0 * 0 + # 1=a/a, 2=a/a
+    a^2 * b^2 * 1 * 1 + # 1=a/a, 2=b/b
+    a^2 * 2*a*b * 0.5 * 0.5 + # 1=a/a, 2=a/b
+    b^2 * a^2 * 1 * 1 + # 1=b/b, 2=a/a
+    b^2 * b^2 * 0 * 0 + # 1=b/b, 2=b/b
+    b^2 * 2*a*b * 0.5 * 0.5 + # 1=b/b, 2=a/b
+    2*a*b * a^2 * 0.5 * 0.5 + # 1=a/b, 2=a/a
+    2*a*b * b^2 * 0.5 * 0.5 + # 1=a/b, 2=b/b
+    2*a*b * 2*a*b * 0.5 * 0.5   # 1=a/b, 2=a/b
   likDis =
     1*a^2 * 1*a^2 * sum(f[l[3],]*c(1,0,0)) * sum(f[l[4],]*c(1,0,0)) + # 1=a/a, 2=a/a
     1*a^2 * 1*b^2 * sum(f[l[3],]*c(0,1,0)) * sum(f[l[4],]*c(0,1,0)) + # 1=a/a, 2=b/b
@@ -49,7 +58,7 @@ test_that("Results for FLB() Example 1 are correct", {
     1*2*a*b * 1*a^2 * f[l[3],2]*0.5 * sum(f[l[4],]*c(0.5,0.5,0)) + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],2]*0.5 * sum(f[l[4],]*c(0,0.5,0.5)) + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],2]*0.5 * sum(f[l[4],]*c(0.25,0.5,0.25)) # 1=a/b, 2=a/b
-  likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'a/b', afreq = c('b' = b, 'a' = a))))
+  likMproband = 2*a*b
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -91,7 +100,16 @@ test_that("Results for FLB() Example 1 using different liability classes are cor
     1*2*a*b * 1*a^2 * f[l[3],2]*0.5 * f[l[4],2]*0.5 + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],2]*0.5 * f[l[4],2]*0.5 + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],2]*0.5 * f[l[4],2]*0.5   # 1=a/b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'a/b', `4` = 'a/b', afreq = c('b' = b, 'a' = a))))
+  likM =
+    a^2 * a^2 * 0 * 0 + # 1=a/a, 2=a/a
+    a^2 * b^2 * 1 * 1 + # 1=a/a, 2=b/b
+    a^2 * 2*a*b * 0.5 * 0.5 + # 1=a/a, 2=a/b
+    b^2 * a^2 * 1 * 1 + # 1=b/b, 2=a/a
+    b^2 * b^2 * 0 * 0 + # 1=b/b, 2=b/b
+    b^2 * 2*a*b * 0.5 * 0.5 + # 1=b/b, 2=a/b
+    2*a*b * a^2 * 0.5 * 0.5 + # 1=a/b, 2=a/a
+    2*a*b * b^2 * 0.5 * 0.5 + # 1=a/b, 2=b/b
+    2*a*b * 2*a*b * 0.5 * 0.5   # 1=a/b, 2=a/b
   likDis =
     1*a^2 * 1*a^2 * sum(f[l[3],]*c(1,0,0)) * sum(f[l[4],]*c(1,0,0)) + # 1=a/a, 2=a/a
     1*a^2 * 1*b^2 * sum(f[l[3],]*c(0,1,0)) * sum(f[l[4],]*c(0,1,0)) + # 1=a/a, 2=b/b
@@ -112,7 +130,7 @@ test_that("Results for FLB() Example 1 using different liability classes are cor
     1*2*a*b * 1*a^2 * f[l[3],2]*0.5 * sum(f[l[4],]*c(0.5,0.5,0)) + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],2]*0.5 * sum(f[l[4],]*c(0,0.5,0.5)) + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],2]*0.5 * sum(f[l[4],]*c(0.25,0.5,0.25)) # 1=a/b, 2=a/b
-  likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'a/b', afreq = c('b' = b, 'a' = a))))
+  likMproband = 2*a*b
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -154,7 +172,16 @@ test_that("Results for FLB() Example 2 are correct", {
     1*2*a*b * 1*a^2 * f[l[3],3]*0 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0.5 + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],3]*0.5 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0 + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],3]*0.25 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0.25 # 1=a/b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b/b', `4` = 'a/b', `5` = 'a/b', `6` = 'a/a', afreq = c('b' = b, 'a' = a))))
+  likM =
+    a^2 * a^2 * 0 * 0 * 0 * 1 + # 1=a/a, 2=a/a
+    a^2 * b^2 * 0 * 1 * 1 * 0 + # 1=a/a, 2=b/b
+    a^2 * 2*a*b * 0 * 0.5 * 0.5 * 0.5 + # 1=a/a, 2=a/b
+    b^2 * a^2 * 0 * 1 * 1 * 0 + # 1=b/b, 2=a/a
+    b^2 * b^2 * 1 * 0 * 0 * 0 + # 1=b/b, 2=b/b
+    b^2 * 2*a*b * 0.5 * 0.5 * 0.5 * 0 + # 1=b/b, 2=a/b
+    2*a*b * a^2 * 0 * 0.5 * 0.5 * 0.5 + # 1=a/b, 2=a/a
+    2*a*b * b^2 * 0.5 * 0.5 * 0.5 * 0 + # 1=a/b, 2=b/b
+    2*a*b * 2*a*b * 0.25 * 0.5 * 0.5 * 0.25 # 1=a/b, 2=a/b
   likDis =
     1*a^2 * 1*a^2 * sum(f[l[3],]*c(1,0,0)) * sum((1-f[l[4],])*c(1,0,0)) * sum((1-f[l[5],])*c(1,0,0)) * sum((1-f[l[6],])*c(1,0,0)) + # 1=a/a, 2=a/a
     1*a^2 * 1*b^2 * sum(f[l[3],]*c(0,1,0)) * sum((1-f[l[4],])*c(0,1,0)) * sum((1-f[l[5],])*c(0,1,0)) * sum((1-f[l[6],])*c(0,1,0)) + # 1=a/a, 2=b/b
@@ -175,7 +202,7 @@ test_that("Results for FLB() Example 2 are correct", {
     1*2*a*b * 1*a^2 * f[l[3],3]*0 * sum((1-f[l[4],])*c(0.5,0.5,0)) * sum((1-f[l[5],])*c(0.5,0,5,0)) * sum((1-f[l[6],])*c(0.5,0,5,0)) + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],3]*0.5 * sum((1-f[l[4],])*c(0,0.5,0.5)) * sum((1-f[l[5],])*c(0,0.5,0.5)) * sum((1-f[l[6],])*c(0,0.5,0.5)) + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],3]*0.25 * sum((1-f[l[4],])*c(0.25,0.5,0.25)) * sum((1-f[l[5],])*c(0.25,0.5,0.25)) * sum((1-f[l[6],])*c(0.25,0.5,0.25)) # 1=a/b, 2=a/b
-   likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b/b', afreq = c('b' = b, 'a' = a))))
+   likMproband = b^2
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -217,7 +244,16 @@ test_that("Results for FLB() Example 2 using different liability classes are cor
     1*2*a*b * 1*a^2 * f[l[3],3]*0 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0.5 + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],3]*0.5 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0 + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],3]*0.25 * (1-f[l[4],2])*0.5 * (1-f[l[5],2])*0.5 * (1-f[l[6],1])*0.25 # 1=a/b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b/b', `4` = 'a/b', `5` = 'a/b', `6` = 'a/a', afreq = c('b' = b, 'a' = a))))
+  likM =
+    a^2 * a^2 * 0 * 0 * 0 * 1 + # 1=a/a, 2=a/a
+    a^2 * b^2 * 0 * 1 * 1 * 0 + # 1=a/a, 2=b/b
+    a^2 * 2*a*b * 0 * 0.5 * 0.5 * 0.5 + # 1=a/a, 2=a/b
+    b^2 * a^2 * 0 * 1 * 1 * 0 + # 1=b/b, 2=a/a
+    b^2 * b^2 * 1 * 0 * 0 * 0 + # 1=b/b, 2=b/b
+    b^2 * 2*a*b * 0.5 * 0.5 * 0.5 * 0 + # 1=b/b, 2=a/b
+    2*a*b * a^2 * 0 * 0.5 * 0.5 * 0.5 + # 1=a/b, 2=a/a
+    2*a*b * b^2 * 0.5 * 0.5 * 0.5 * 0 + # 1=a/b, 2=b/b
+    2*a*b * 2*a*b * 0.25 * 0.5 * 0.5 * 0.25 # 1=a/b, 2=a/b
   likDis =
     1*a^2 * 1*a^2 * sum(f[l[3],]*c(1,0,0)) * sum((1-f[l[4],])*c(1,0,0)) * sum((1-f[l[5],])*c(1,0,0)) * sum((1-f[l[6],])*c(1,0,0)) + # 1=a/a, 2=a/a
     1*a^2 * 1*b^2 * sum(f[l[3],]*c(0,1,0)) * sum((1-f[l[4],])*c(0,1,0)) * sum((1-f[l[5],])*c(0,1,0)) * sum((1-f[l[6],])*c(0,1,0)) + # 1=a/a, 2=b/b
@@ -238,7 +274,7 @@ test_that("Results for FLB() Example 2 using different liability classes are cor
     1*2*a*b * 1*a^2 * f[l[3],3]*0 * sum((1-f[l[4],])*c(0.5,0.5,0)) * sum((1-f[l[5],])*c(0.5,0,5,0)) * sum((1-f[l[6],])*c(0.5,0,5,0)) + # 1=a/b, 2=a/a
     1*2*a*b * 1*b^2 * f[l[3],3]*0.5 * sum((1-f[l[4],])*c(0,0.5,0.5)) * sum((1-f[l[5],])*c(0,0.5,0.5)) * sum((1-f[l[6],])*c(0,0.5,0.5)) + # 1=a/b, 2=b/b
     1*2*a*b * 1*2*a*b * f[l[3],3]*0.25 * sum((1-f[l[4],])*c(0.25,0.5,0.25)) * sum((1-f[l[5],])*c(0.25,0.5,0.25)) * sum((1-f[l[6],])*c(0.25,0.5,0.25)) # 1=a/b, 2=a/b
-  likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b/b', afreq = c('b' = b, 'a' = a))))
+  likMproband = b^2
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -285,7 +321,17 @@ test_that("Results for FLB() Example 3 are correct", {
     1*b * 1*a^2 * f$male[l[3],2]*0 * (1-f$male[l[4],1])*1 * sum((1-f$female[l[5],])*numer1_5*c(0,1,0)) + # 1=b, 2=a/a
     1*b * 1*b^2 * f$male[l[3],2]*1 * (1-f$male[l[4],1])*0 * sum((1-f$female[l[5],])*numer1_5*c(0,0,1)) + # 1=b, 2=b/b
     1*b * 1*2*a*b * f$male[l[3],2]*0.5 * (1-f$male[l[4],1])*0.5 * sum((1-f$female[l[5],])*numer1_5*c(0,0.5,0.5)) # 1=b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b', `4` = 'a',  `7` = 'b', afreq = c('b' = b, 'a' = a), chrom = 'X')))
+  likM_5_aa = a * 0 * 1 + b * 0 * 1 # 6=a + 6=b
+  likM_5_bb = a * 1 * 1 + b * 1 * 1 # 6=a + 6=b
+  likM_5_ab = a * 0.5 * 1 + b * 0.5 * 1 # 6=a + 6=b
+  likM_5 = c(likM_5_aa, likM_5_ab, likM_5_bb)
+  likM =
+    1*a * 1*a^2 * 0 * 1 * sum(likM_5*c(1,0,0)) + # 1=a, 2=a/a
+    1*a * 1*b^2 * 1 * 0 * sum(likM_5*c(0,1,0)) + # 1=a, 2=b/b
+    1*a * 1*2*a*b * 0.5 * 0.5 * sum(likM_5*c(0.5,0.5,0)) + # 1=a, 2=a/b
+    1*b * 1*a^2 * 0 * 1 * sum(likM_5*c(0,1,0)) + # 1=b, 2=a/a
+    1*b * 1*b^2 * 1 * 0 * sum(likM_5*c(0,0,1)) + # 1=b, 2=b/b
+    1*b * 1*2*a*b * 0.5 * 0.5 * sum(likM_5*c(0,0.5,0.5)) # 1=b, 2=a/b
   likDis_5_aa = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(1,0)) * sum((1-f$female[l[8],])*c(1,0,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(1,0)) * sum((1-f$female[l[8],])*c(0,1,0)) # 6=a + 6=b
   likDis_5_bb = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(0,1)) * sum((1-f$female[l[8],])*c(0,1,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(0,1)) * sum((1-f$female[l[8],])*c(0,0,1)) # 6=a + 6=b
   likDis_5_ab = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(0.5,0.5)) * sum((1-f$female[l[8],])*c(0.5,0.5,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(0.5,0.5)) * sum((1-f$female[l[8],])*c(0,0.5,0.5)) # 6=a + 6=b
@@ -308,7 +354,7 @@ test_that("Results for FLB() Example 3 are correct", {
     1*b * 1*a^2 * sum(f$male[l[3],]*c(1,0)) * sum((1-f$male[l[4],])*c(1,0)) * sum((1-f$female[l[5],])*denom2_5*c(0,1,0)) + # 1=b, 2=a/a
     1*b * 1*b^2 * sum(f$male[l[3],]*c(0,1)) * sum((1-f$male[l[4],])*c(0,1)) * sum((1-f$female[l[5],])*denom2_5*c(0,0,1)) + # 1=b, 2=b/b
     1*b * 1*2*a*b * sum(f$male[l[3],]*c(0.5,0.5)) * sum((1-f$male[l[4],])*c(0.5,0.5))* sum((1-f$female[l[5],])*denom2_5*c(0,0.5,0.5)) # 1=b, 2=a/b
-  likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b', afreq = c('b' = b, 'a' = a), chrom = 'X')))
+  likMproband = b
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -355,7 +401,17 @@ test_that("Results for FLB() Example 3 using different liability classes are cor
     1*b * 1*a^2 * f$male[l[3],2]*0 * (1-f$male[l[4],1])*1 * sum((1-f$female[l[5],])*numer1_5*c(0,1,0)) + # 1=b, 2=a/a
     1*b * 1*b^2 * f$male[l[3],2]*1 * (1-f$male[l[4],1])*0 * sum((1-f$female[l[5],])*numer1_5*c(0,0,1)) + # 1=b, 2=b/b
     1*b * 1*2*a*b * f$male[l[3],2]*0.5 * (1-f$male[l[4],1])*0.5 * sum((1-f$female[l[5],])*numer1_5*c(0,0.5,0.5)) # 1=b, 2=a/b
-  likM = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b', `4` = 'a',  `7` = 'b', afreq = c('b' = b, 'a' = a), chrom = 'X')))
+  likM_5_aa = a * 0 * 1 + b * 0 * 1 # 6=a + 6=b
+  likM_5_bb = a * 1 * 1 + b * 1 * 1 # 6=a + 6=b
+  likM_5_ab = a * 0.5 * 1 + b * 0.5 * 1 # 6=a + 6=b
+  likM_5 = c(likM_5_aa, likM_5_ab, likM_5_bb)
+  likM =
+    1*a * 1*a^2 * 0 * 1 * sum(likM_5*c(1,0,0)) + # 1=a, 2=a/a
+    1*a * 1*b^2 * 1 * 0 * sum(likM_5*c(0,1,0)) + # 1=a, 2=b/b
+    1*a * 1*2*a*b * 0.5 * 0.5 * sum(likM_5*c(0.5,0.5,0)) + # 1=a, 2=a/b
+    1*b * 1*a^2 * 0 * 1 * sum(likM_5*c(0,1,0)) + # 1=b, 2=a/a
+    1*b * 1*b^2 * 1 * 0 * sum(likM_5*c(0,0,1)) + # 1=b, 2=b/b
+    1*b * 1*2*a*b * 0.5 * 0.5 * sum(likM_5*c(0,0.5,0.5)) # 1=b, 2=a/b
   likDis_5_aa = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(1,0)) * sum((1-f$female[l[8],])*c(1,0,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(1,0)) * sum((1-f$female[l[8],])*c(0,1,0)) # 6=a + 6=b
   likDis_5_bb = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(0,1)) * sum((1-f$female[l[8],])*c(0,1,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(0,1)) * sum((1-f$female[l[8],])*c(0,0,1)) # 6=a + 6=b
   likDis_5_ab = (1-f$male[l[6],1])*a * sum(f$male[l[7],]*c(0.5,0.5)) * sum((1-f$female[l[8],])*c(0.5,0.5,0)) + (1-f$male[l[6],2])*b * sum(f$male[l[7],]*c(0.5,0.5)) * sum((1-f$female[l[8],])*c(0,0.5,0.5)) # 6=a + 6=b
@@ -378,7 +434,7 @@ test_that("Results for FLB() Example 3 using different liability classes are cor
     1*b * 1*a^2 * sum(f$male[l[3],]*c(1,0)) * sum((1-f$male[l[4],])*c(1,0)) * sum((1-f$female[l[5],])*denom2_5*c(0,1,0)) + # 1=b, 2=a/a
     1*b * 1*b^2 * sum(f$male[l[3],]*c(0,1)) * sum((1-f$male[l[4],])*c(0,1)) * sum((1-f$female[l[5],])*denom2_5*c(0,0,1)) + # 1=b, 2=b/b
     1*b * 1*2*a*b * sum(f$male[l[3],]*c(0.5,0.5)) * sum((1-f$male[l[4],])*c(0.5,0.5))* sum((1-f$female[l[5],])*denom2_5*c(0,0.5,0.5)) # 1=b, 2=a/b
-  likMproband = likelihood(setMarkers(x, marker(x, name = 'm', `3` = 'b', afreq = c('b' = b, 'a' = a), chrom = 'X')))
+  likMproband = b
 
   # test
   expect_equal(numer1, unname(FLB_res[[2]]["numer1"]))
@@ -387,6 +443,26 @@ test_that("Results for FLB() Example 3 using different liability classes are cor
   expect_equal(denom2, unname(FLB_res[[2]]["denom2"]))
   expect_equal(likMproband, unname(FLB_res[[3]]["likMproband"]))
   expect_equal((numer1/likM)*(likMproband/denom2), unname(FLB_res[[1]]["FLB"]))
+
+})
+
+test_that("FLB() results for some recessive inheritance examples are correct", {
+
+  dfreq = 0.00123
+
+  # AR model: affected siblings
+  expect_equal(
+    FLB(nuclearPed(2), proband = 3, aff = 3:4, homozygous = 3:4, carriers = 1:2,
+        freq = dfreq, penetrances = c(0,0,1)),
+    4/(1-dfreq)^2
+  )
+
+  # XR model: affected brothers
+  expect_equal(
+    FLB(nuclearPed(2), proband = 3, aff = 3:4, carriers = 2:4, Xchrom = TRUE,
+        freq = dfreq, penetrances = list(male = c(0,1), female = c(0,0,1))),
+    2/(1-dfreq)
+  )
 
 })
 
