@@ -10,11 +10,14 @@
 #' x = nuclearPed(2)
 #' plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3,
 #'                 carriers = 3:4, margins = c(1,3,1,1))
+#' x = cousinPed(1, child = TRUE)
+#' plotSegregation(x, affected = c(1, 9), unknown = 2, proband = 9,
+#'                 homozygous = 9, deceased = 1, margins = c(1,3,1,1))
 #'
 #' @importFrom graphics arrows strheight text
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
-                           carriers = NULL, noncarriers = NULL, cex = 1,
+                           carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
                            margins = rep(1, 4), ...) {
 
   # Input checks
@@ -36,19 +39,25 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
            keep.par = TRUE,
            ...)
 
+  # Reorder positions
+  p$x = p$x[internalID(x, ids = 1:pedsize(x))]
+  p$y = p$y[internalID(x, ids = 1:pedsize(x))]
+
   vdist = p$boxh + 3.25 * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
     text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+
+  if(!is.null(homozygous))
+    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = 3, offset = 0)
 
   if(!is.null(noncarriers))
     text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = 3, offset = 0)
 
   # proband arrow
   if(!is.null(proband)) {
-    prob = internalID(x, proband)
-    corner.x = p$x[prob] - .5*p$boxw
-    corner.y = p$y[prob] + p$boxh
+    corner.x = p$x[proband] - .5*p$boxw
+    corner.y = p$y[proband] + p$boxh
     arrows(corner.x - 1.7*p$boxw, corner.y + 0.9*p$boxh, corner.x - .5*p$boxw, corner.y , lwd = 2, length = .15, xpd = NA)
   }
 }

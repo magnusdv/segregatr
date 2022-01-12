@@ -2,11 +2,15 @@ Package: segregatr
 Title: Segregation Analysis for Variant Interpretation
 Version: 0.2.0.9000
 Authors@R: 
-    person(given = "Magnus Dehli",
+    c(person(given = "Magnus Dehli",
            family = "Vigeland",
            role = c("aut", "cre"),
            email = "m.d.vigeland@medisin.uio.no",
-           comment = c(ORCID = "0000-0002-9134-4962"))
+           comment = c(ORCID = "0000-0002-9134-4962")),
+    person(given = "Christian",
+           family = "Carrizosa",
+           role = "aut",
+           comment = c(ORCID = "0000-0002-3919-0011")))
 Description: An implementation of the full-likelihood Bayes factor (FLB) 
     for evaluating segregation evidence in clinical medical genetics. The method 
     was introduced by Thompson et al. (2003) <doi:10.1086/378100>, and further 
@@ -27,4 +31,3 @@ Suggests:
     testthat
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-
