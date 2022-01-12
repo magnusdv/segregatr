@@ -94,9 +94,9 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
   if(Xchrom && length(err4 <- intersect(males, homozygous)))
     stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err4)
 
-  if(missing(freq) || is.na(freq))
+  if(missing(freq) || is.null(freq))
     stop2("An allele frequency must be specified")
-  if(!is.numeric(freq) || length(freq) != 1 || freq <= 0 || freq >= 1)
+  if(!is.numeric(freq) || length(freq) != 1 || is.na(freq) || freq <= 0 || freq >= 1)
     stop2("The allele frequency must be a single number strictly between 0 and 1")
 
   if(plot) {
