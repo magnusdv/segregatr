@@ -6,7 +6,8 @@
 \usage{
 FLB(
   x,
-  carriers,
+  carriers = NULL,
+  homozygous = NULL,
   noncarriers = NULL,
   freq,
   affected,
@@ -15,6 +16,7 @@ FLB(
   penetrances,
   liability = NULL,
   loopBreakers = NULL,
+  Xchrom = FALSE,
   details = FALSE,
   plot = FALSE,
   ...
@@ -24,7 +26,10 @@ FLB(
 \item{x}{A \code{\link[pedtools:ped]{pedtools::ped()}} object.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry the variant in question.}
+labels of pedigree members known to carry one copy of the variant in question.}
+
+\item{homozygous}{A character vector (or coercible to such), containing the ID
+labels of pedigree members known to carry two copies of the variant in question.}
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
@@ -39,19 +44,16 @@ frequency of the observed allele.}
 \item{proband}{The ID label of the proband. This person must also be in both
 \code{carriers} and \code{affected}.}
 
-\item{penetrances}{Either a numeric vector of length 3, corresponding to
-\verb{(f0, f1, f2)} or a matrix or data frame with 3 columns. Each row contains
-the penetrance values of a liability class.}
+\item{penetrances}{For autosomal models, a numeric vector of length 3, corresponding to \verb{(f0, f1, f2)}. It can also be a matrix or data frame with 3 columns where each row contains the penetrance values of a liability class.
+For X-linked models, a list of two numeric vectors named \code{male} and \code{female}, of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively. Alternatively, each list entry may be a matrix or data frame (with the same number of columns) where each row represents a liability class.}
 
-\item{liability}{A vector of length \code{pedsize(x)}, containing for each
-pedigree member the row number of \code{penetrances} which should be used for
-that individual. (If \code{penetrances} is just a vector, it will be used for
-all classes.) If \code{liability} is NULL (the default), it is set to \code{1} for
-all individuals.}
+\item{liability}{A vector of length \code{pedsize(x)}, containing for each pedigree member the row number of \code{penetrances} which should be used for that individual. (If \code{penetrances} is just a vector (or one for each sex in X-linked models), it will be used for all classes.) If \code{liability} is NULL (the default), it is set to \code{1} for all individuals.}
 
 \item{loopBreakers}{(Relevant only if \code{x} has loops.) A vector of ID labels
 indicating loop breakers. The default value (NULL) initiates automatic loop
 breaking, which is recommended in most cases.}
+
+\item{Xchrom}{A logical, indicating if a model of X-linked inheritance should be applied.}
 
 \item{details}{A logical, indicating if detailed output should be returned
 (for debugging purposes).}
@@ -71,9 +73,18 @@ Computes the Bayes factor for co-segregation, as described by Thompson et al.
 \examples{
 
 x = nuclearPed(2)
-
 FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
+
+x = nuclearPed(4)
+FLB(x, carriers = 4:5, homozygous = 3, noncarriers = 6, aff = 3, unknown = 1:2,
+    freq = 0.0001, penetrances = c(0.01, 0.01, 0.99), proband = 3)
+
+x = nuclearPed(3, sex = c(1, 1, 2))
+x = addChildren(x, mo = 5, sex = 1:2)
+FLB(x, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
+    freq = 0.0001, penetrances = list(male = c(0, 1), female = c(0, 0, 1)),
+    proband = 7, Xchrom = TRUE)
 
 }
 \references{

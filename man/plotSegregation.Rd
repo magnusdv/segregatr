@@ -10,6 +10,7 @@ plotSegregation(
   unknown = NULL,
   proband = NULL,
   carriers = NULL,
+  homozygous = NULL,
   noncarriers = NULL,
   cex = 1,
   margins = rep(1, 4),
@@ -27,7 +28,10 @@ plotSegregation(
 \code{carriers} and \code{affected}.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry the variant in question.}
+labels of pedigree members known to carry one copy of the variant in question.}
+
+\item{homozygous}{A character vector (or coercible to such), containing the ID
+labels of pedigree members known to carry two copies of the variant in question.}
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
@@ -44,5 +48,8 @@ Plots a pedigree showing the segregation of a variant.
 x = nuclearPed(2)
 plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3,
                 carriers = 3:4, margins = c(1,3,1,1))
+x = cousinPed(1, child = TRUE)
+plotSegregation(x, affected = c(1, 9), unknown = 2, proband = 9,
+                homozygous = 9, deceased = 1, margins = c(1,3,1,1))
 
 }
