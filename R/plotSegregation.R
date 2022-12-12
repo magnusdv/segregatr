@@ -12,13 +12,14 @@
 #'                 carriers = 3:4, margins = c(1,3,1,1))
 #' x = cousinPed(1, child = TRUE)
 #' plotSegregation(x, affected = c(1, 9), unknown = 2, proband = 9,
-#'                 homozygous = 9, deceased = 1, margins = c(1,3,1,1))
+#'                 homozygous = 9, deceased = 1:2)
 #'
 #' @importFrom graphics arrows strheight text
+#' @importFrom utils packageVersion
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
-                           margins = rep(1, 4), ...) {
+                           margins = 1, ...) {
 
   # Input checks
   allids = c(proband, affected, unknown, carriers, noncarriers)
@@ -30,6 +31,20 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
 
   if(length(err2 <- intersect(carriers, noncarriers)))
     stop2("Individual specified as both a carrier and a non-carrier: ", err2)
+
+  # Invoke automatic margin adjustment unless fully specified
+  autoMargins = length(margins) < 4
+
+  # Adjust margins if arrow on left side
+  if(autoMargins && packageVersion("pedtools") > 2.0) {
+
+    align = .pedAlignment(x, ...)
+    idx = match(internalID(x, proband), align$plotord)
+    if(align$xall[idx] == 0) {
+      margins = rep_len(margins, 4)
+      margins[2] = margins[2] + 2.5
+    }
+  }
 
   p = plot(x,
            aff = affected,
@@ -58,6 +73,10 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   if(!is.null(proband)) {
     corner.x = p$x[proband] - .5*p$boxw
     corner.y = p$y[proband] + p$boxh
-    arrows(corner.x - 1.7*p$boxw, corner.y + 0.9*p$boxh, corner.x - .5*p$boxw, corner.y , lwd = 2, length = .15, xpd = NA)
+    arrows(corner.x - 1.7*p$boxw, corner.y + 0.9*p$boxh, corner.x - .5*p$boxw, corner.y ,
+           lwd = 2, length = .15, xpd = NA)
   }
+
+  # Return plot parameters
+  invisible(p)
 }

@@ -13,7 +13,7 @@ plotSegregation(
   homozygous = NULL,
   noncarriers = NULL,
   cex = 1,
-  margins = rep(1, 4),
+  margins = 1,
   ...
 )
 }
@@ -50,6 +50,6 @@ plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3,
                 carriers = 3:4, margins = c(1,3,1,1))
 x = cousinPed(1, child = TRUE)
 plotSegregation(x, affected = c(1, 9), unknown = 2, proband = 9,
-                homozygous = 9, deceased = 1, margins = c(1,3,1,1))
+                homozygous = 9, deceased = 1:2)
 
 }
