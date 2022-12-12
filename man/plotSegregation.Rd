@@ -46,10 +46,10 @@ Plots a pedigree showing the segregation of a variant.
 \examples{
 
 x = nuclearPed(2)
-plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3,
-                carriers = 3:4, margins = c(1,3,1,1))
-x = cousinPed(1, child = TRUE)
-plotSegregation(x, affected = c(1, 9), unknown = 2, proband = 9,
+plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3, carriers = 3:4)
+
+y = cousinPed(1, child = TRUE)
+plotSegregation(y, affected = 9, unknown = 1:2, proband = 9,
                 homozygous = 9, deceased = 1:2)
 
 }
