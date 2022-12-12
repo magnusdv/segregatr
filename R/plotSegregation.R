@@ -32,6 +32,9 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   if(length(err2 <- intersect(carriers, noncarriers)))
     stop2("Individual specified as both a carrier and a non-carrier: ", err2)
 
+  if(length(proband) > 1)
+    stop2("At most one proband is permitted")
+
   # Invoke automatic margin adjustment unless fully specified
   autoMargins = length(margins) < 4
 
