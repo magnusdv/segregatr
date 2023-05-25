@@ -19,7 +19,7 @@
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
-                           margins = 1, ...) {
+                           margins = 1, pos = 3, ...) {
 
   # Input checks
   allids = c(proband, affected, unknown, carriers, noncarriers, homozygous)
@@ -69,16 +69,26 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   p$x = p$x[internalID(x, ids = 1:pedsize(x))]
   p$y = p$y[internalID(x, ids = 1:pedsize(x))]
 
-  vdist = p$boxh + 3.25 * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
+  # Genotype label position
+  if(pos %in% c(2,4)) {
+    dist = -3
+    offset = 0.75
+  }
+  else  {
+    pos = 3
+    dist = +3.25
+    offset = 0
+  }
+  vdist = p$boxh + dist * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
-    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = pos, offset = offset)
 
   if(!is.null(homozygous))
-    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = pos, offset = offset)
 
   if(!is.null(noncarriers))
-    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = pos, offset = offset)
 
   # proband arrow
   if(hasProband) {
