@@ -19,7 +19,7 @@
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
-                           margins = 1, pos = 3, ...) {
+                           margins = 1, pos.geno = "bottom", pos.arrow = "bottomleft", ...) {
 
   # Input checks
   allids = c(proband, affected, unknown, carriers, noncarriers, homozygous)
@@ -70,31 +70,30 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   p$y = p$y[internalID(x, ids = 1:pedsize(x))]
 
   # Genotype label position
-  if(pos %in% c(2,4)) {
-    dist = -3
-    offset = 0.75
-  }
-  else  {
-    pos = 3
-    dist = +3.25
-    offset = 0
-  }
-  vdist = p$boxh + dist * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
+  lpos = switch(pos.geno,
+                "topleft" = c(-3, 2, 0.75),
+                "topright" = c(-3, 4, 0.75),
+                c(3.25, 3, 0)
+  )
+  vdist = p$boxh + lpos[1] * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
-    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = pos, offset = offset)
+    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(homozygous))
-    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = pos, offset = offset)
+    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(noncarriers))
-    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = pos, offset = offset)
+    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   # proband arrow
   if(hasProband) {
-    corner.x = p$x[proband] - .5*p$boxw
-    corner.y = p$y[proband] + p$boxh
-    arrows(corner.x - 1.7*p$boxw, corner.y + 0.9*p$boxh, corner.x - .5*p$boxw, corner.y ,
+    x.mod = ifelse(pos.arrow %in% c("topright", "bottomright"), +1, -1)
+    y.mod = ifelse(pos.arrow %in% c("topleft", "topright"), 0, 1)
+    corner.x = p$x[proband] + .5*x.mod*p$boxw
+    corner.y = p$y[proband] + y.mod*p$boxh
+    arrows(corner.x + 1.7*x.mod*p$boxw, corner.y + 0.9*y.mod*p$boxh - 0.9*(1-y.mod)*p$boxh,
+           corner.x + .5*x.mod*p$boxw, corner.y,
            lwd = 2, length = .15, xpd = NA)
   }
 

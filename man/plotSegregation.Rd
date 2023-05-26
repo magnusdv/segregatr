@@ -12,6 +12,8 @@ plotSegregation(
   carriers = NULL,
   homozygous = NULL,
   noncarriers = NULL,
+  pos.geno = c("bottom", "topleft", "topright"),
+  pos.arrow = c("bottomleft", "topleft", "topright", "bottomright"),
   cex = 1,
   margins = 1,
   ...
@@ -35,6 +37,9 @@ labels of pedigree members known to carry two copies of the variant in question.
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
+
+\item{pos.geno, pos.arrow}{Character arguments specifying the positions of the
+genotype labels and the proband indicator.}
 
 \item{cex, margins}{Arguments passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 
