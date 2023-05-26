@@ -4,15 +4,21 @@
 #'
 #' @inheritParams FLB
 #' @param cex,margins Arguments passed on to [pedtools::plot.ped()].
+#' @param pos.geno Position of genotype labels relative to pedigree symbols;
+#'   either "bottom" (default), "topleft" or "topright".
+#' @param pos.arrow Position of the proband arrow; either "bottomleft",
+#'   "bottomright", "topleft" or "topright".
 #'
 #' @examples
 #'
-#' x = nuclearPed(2)
-#' plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3, carriers = 3:4)
+#' x = cousinPed(1)
+#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+#'                 homozygous = 8, noncarriers = 6:7, proband = 8)
 #'
-#' y = cousinPed(1, child = TRUE)
-#' plotSegregation(y, affected = 9, unknown = 1:2, proband = 9,
-#'                 homozygous = 9, deceased = 1:2)
+#' # Different placement of genotypes and proband arrow
+#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+#'                 homozygous = 8, noncarriers = 6:7, proband = 8,
+#'                 pos.geno = "topleft", pos.arrow = "bottomright")
 #'
 #' @importFrom graphics arrows strheight text
 #' @importFrom utils packageVersion
