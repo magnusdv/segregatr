@@ -77,10 +77,11 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
 
   # Genotype label position
   lpos = switch(pos.geno,
-                "topleft" = c(-3, 2, 0.75),
-                "topright" = c(-3, 4, 0.75),
-                c(3.25, 3, 0)
-  )
+                bottom = c(3.25, 3, 0),
+                topleft = c(-3, 2, 0.75),
+                topright = c(-3, 4, 0.75),
+                stop2('`pos.geno` must be either "bottom" , "topleft" or "topright": ', pos.geno))
+
   vdist = p$boxh + lpos[1] * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
@@ -94,12 +95,19 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
 
   # proband arrow
   if(hasProband) {
-    x.mod = ifelse(pos.arrow %in% c("topright", "bottomright"), +1, -1)
-    y.mod = ifelse(pos.arrow %in% c("topleft", "topright"), 0, 1)
-    corner.x = p$x[proband] + .5*x.mod*p$boxw
-    corner.y = p$y[proband] + y.mod*p$boxh
-    arrows(corner.x + 1.7*x.mod*p$boxw, corner.y + 0.9*y.mod*p$boxh - 0.9*(1-y.mod)*p$boxh,
-           corner.x + .5*x.mod*p$boxw, corner.y,
+    mod = switch(pos.arrow,
+           bottomleft = list(x = -1, y = 1),
+           bottomright = list(x = 1, y = 1),
+           topleft = list(x = -1, y = 0),
+           topright = list(x = 1, y = 0),
+           stop2('`pos.arrow` must be either "bottomleft", "bottomright", "topleft" or "topright": ', pos.arrow))
+
+    corner.x = p$x[proband] + .5*mod$x*p$boxw
+    corner.y = p$y[proband] + mod$y*p$boxh
+    arrows(x0 = corner.x + 1.7*mod$x*p$boxw,
+           y0 = corner.y + 0.9*mod$y*p$boxh - 0.9*(1-mod$y)*p$boxh,
+           x1 = corner.x + .5*mod$x*p$boxw,
+           y1 = corner.y,
            lwd = 2, length = .15, xpd = NA)
   }
 
