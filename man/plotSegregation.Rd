@@ -14,6 +14,8 @@ plotSegregation(
   noncarriers = NULL,
   cex = 1,
   margins = 1,
+  pos.geno = "bottom",
+  pos.arrow = "bottomleft",
   ...
 )
 }
@@ -38,6 +40,12 @@ ID labels of pedigree members known \emph{not} to carry the variant in question.
 
 \item{cex, margins}{Arguments passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 
+\item{pos.geno}{Position of genotype labels relative to pedigree symbols;
+either "bottom" (default), "topleft" or "topright".}
+
+\item{pos.arrow}{Position of the proband arrow; either "bottomleft",
+"bottomright", "topleft" or "topright".}
+
 \item{...}{Optional plot parameters passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 }
 \description{
@@ -45,11 +53,13 @@ Plots a pedigree showing the segregation of a variant.
 }
 \examples{
 
-x = nuclearPed(2)
-plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3, carriers = 3:4)
+x = cousinPed(1)
+plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+                homozygous = 8, noncarriers = 6:7, proband = 8)
 
-y = cousinPed(1, child = TRUE)
-plotSegregation(y, affected = 9, unknown = 1:2, proband = 9,
-                homozygous = 9, deceased = 1:2)
+# Different placement of genotypes and proband arrow
+plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+                homozygous = 8, noncarriers = 6:7, proband = 8,
+                pos.geno = "topleft", pos.arrow = "bottomright")
 
 }

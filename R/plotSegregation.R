@@ -4,22 +4,28 @@
 #'
 #' @inheritParams FLB
 #' @param cex,margins Arguments passed on to [pedtools::plot.ped()].
+#' @param pos.geno Position of genotype labels relative to pedigree symbols;
+#'   either "bottom" (default), "topleft" or "topright".
+#' @param pos.arrow Position of the proband arrow; either "bottomleft",
+#'   "bottomright", "topleft" or "topright".
 #'
 #' @examples
 #'
-#' x = nuclearPed(2)
-#' plotSegregation(x, affected = 3:4, unknown = 1:2, proband = 3, carriers = 3:4)
+#' x = cousinPed(1)
+#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+#'                 homozygous = 8, noncarriers = 6:7, proband = 8)
 #'
-#' y = cousinPed(1, child = TRUE)
-#' plotSegregation(y, affected = 9, unknown = 1:2, proband = 9,
-#'                 homozygous = 9, deceased = 1:2)
+#' # Different placement of genotypes and proband arrow
+#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
+#'                 homozygous = 8, noncarriers = 6:7, proband = 8,
+#'                 pos.geno = "topleft", pos.arrow = "bottomright")
 #'
 #' @importFrom graphics arrows strheight text
 #' @importFrom utils packageVersion
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
-                           margins = 1, ...) {
+                           margins = 1, pos.geno = "bottom", pos.arrow = "bottomleft", ...) {
 
   # Input checks
   allids = c(proband, affected, unknown, carriers, noncarriers, homozygous)
@@ -69,22 +75,39 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   p$x = p$x[internalID(x, ids = 1:pedsize(x))]
   p$y = p$y[internalID(x, ids = 1:pedsize(x))]
 
-  vdist = p$boxh + 3.25 * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
+  # Genotype label position
+  lpos = switch(pos.geno,
+                bottom = c(3.25, 3, 0),
+                topleft = c(-3, 2, 0.75),
+                topright = c(-3, 4, 0.75),
+                stop2('`pos.geno` must be either "bottom" , "topleft" or "topright": ', pos.geno))
+
+  vdist = p$boxh + lpos[1] * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
-    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(homozygous))
-    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(noncarriers))
-    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = 3, offset = 0)
+    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   # proband arrow
   if(hasProband) {
-    corner.x = p$x[proband] - .5*p$boxw
-    corner.y = p$y[proband] + p$boxh
-    arrows(corner.x - 1.7*p$boxw, corner.y + 0.9*p$boxh, corner.x - .5*p$boxw, corner.y ,
+    mod = switch(pos.arrow,
+           bottomleft = list(x = -1, y = 1),
+           bottomright = list(x = 1, y = 1),
+           topleft = list(x = -1, y = 0),
+           topright = list(x = 1, y = 0),
+           stop2('`pos.arrow` must be either "bottomleft", "bottomright", "topleft" or "topright": ', pos.arrow))
+
+    corner.x = p$x[proband] + .5*mod$x*p$boxw
+    corner.y = p$y[proband] + mod$y*p$boxh
+    arrows(x0 = corner.x + 1.7*mod$x*p$boxw,
+           y0 = corner.y + 0.9*mod$y*p$boxh - 0.9*(1-mod$y)*p$boxh,
+           x1 = corner.x + .5*mod$x*p$boxw,
+           y1 = corner.y,
            lwd = 2, length = .15, xpd = NA)
   }
 
