@@ -38,19 +38,53 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
 
   hasProband = length(proband) > 0
 
+  pos.geno = match.arg(pos.geno, c("bottom", "topleft", "topright"))
+  pos.arrow = match.arg(pos.arrow, c("bottomleft", "bottomright", "topleft", "topright"))
+
+  # Main alignment
+  align = .pedAlignment(x, ...)
+  xpos = align$x
+  ypos = align$y
+  names(xpos) = names(ypos) = labels(x)
 
   # Invoke automatic margin adjustment unless fully specified
   autoMargins = length(margins) < 4
 
-  # Adjust margins if arrow on left side
-  if(hasProband && autoMargins && packageVersion("pedtools") > 2.0) {
+  # Adjust margins to fit arrow and genotypes
+  if(autoMargins) {
+    margins = rep_len(margins, 4)
+    xr = align$xrange
+    yr = align$yrange
 
-    align = .pedAlignment(x, ...)
-    idx = match(internalID(x, proband), align$plotord)
-    if(align$xall[idx] == 0) {
-      margins = rep_len(margins, 4)
-      margins[2] = margins[2] + 2.5
+    # Extra margins for genotype labels
+    typed = c(carriers, noncarriers, homozygous)
+
+    homozL = pos.geno == "topleft" && any(xpos[homozygous] == xr[1])
+    carrL  = pos.geno == "topleft" && any(xpos[typed] == xr[1])
+
+    homozR = pos.geno == "topright" && any(xpos[homozygous] == xr[2])
+    carrR  = pos.geno == "topright" && any(xpos[typed] == xr[2])
+
+    carrT = pos.geno %in% c("topleft", "topright") && any(ypos[typed] == yr[1])
+    carrB = pos.geno == "bottom" && any(ypos[typed] == yr[2])
+
+    # Adjustment for arrow?
+    if(hasProband) {
+      arrowL = xpos[proband] == xr[1] && pos.arrow %in% c("bottomleft", "topleft")
+      arrowR = xpos[proband] == xr[2] && pos.arrow %in% c("bottomright", "topright")
+      arrowT = ypos[proband] == yr[1] && pos.arrow %in% c("topleft", "topright")
+      arrowB = ypos[proband] == yr[2] && pos.arrow %in% c("bottomleft", "bottomright")
     }
+    else
+      arrowL = arrowR = arrowT = arrowB = FALSE
+
+    # Combine adjustments (geno + arrow)
+    extraMargins = c(if(carrB) 0.75 else if(arrowB) 0.5 else 0,
+                     if(arrowL) 2.5  else if(homozL) 1.5 else if(carrL) 0.75 else 0,
+                     if(arrowT) 1.25 else if(carrT) 1 else 0,
+                     if(arrowR) 2.5  else if(homozR) 1.5 else if(carrR) 0.75 else 0)
+
+    margins = margins + extraMargins
   }
 
   p = plot(x,
@@ -61,27 +95,25 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
            keep.par = TRUE,
            ...)
 
-  # Reorder positions
-  p$x = p$x[internalID(x, ids = 1:pedsize(x))]
-  p$y = p$y[internalID(x, ids = 1:pedsize(x))]
+  boxw = p$scaling$boxw
+  boxh = p$scaling$boxh
 
   # Genotype label position
   lpos = switch(pos.geno,
                 bottom = c(3.25, 3, 0),
                 topleft = c(-3, 2, 0.75),
-                topright = c(-3, 4, 0.75),
-                stop2('`pos.geno` must be either "bottom" , "topleft" or "topright": ', pos.geno))
+                topright = c(-3, 4, 0.75))
 
-  vdist = p$boxh + lpos[1] * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
+  vdist = boxh + lpos[1] * abs(strheight("M", cex = cex))  # vertical dist from top of symbol to "+"
 
   if(!is.null(carriers))
-    text(p$x[carriers], p$y[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
+    text(xpos[carriers], ypos[carriers] + vdist, labels = "+", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(homozygous))
-    text(p$x[homozygous], p$y[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
+    text(xpos[homozygous], ypos[homozygous] + vdist, labels = "++", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   if(!is.null(noncarriers))
-    text(p$x[noncarriers], p$y[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
+    text(xpos[noncarriers], ypos[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
   # proband arrow
   if(hasProband) {
@@ -89,16 +121,15 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
            bottomleft = list(x = -1, y = 1),
            bottomright = list(x = 1, y = 1),
            topleft = list(x = -1, y = 0),
-           topright = list(x = 1, y = 0),
-           stop2('`pos.arrow` must be either "bottomleft", "bottomright", "topleft" or "topright": ', pos.arrow))
+           topright = list(x = 1, y = 0))
 
-    corner.x = p$x[proband] + .5*mod$x*p$boxw
-    corner.y = p$y[proband] + mod$y*p$boxh
-    arrows(x0 = corner.x + 1.7*mod$x*p$boxw,
-           y0 = corner.y + 0.9*mod$y*p$boxh - 0.9*(1-mod$y)*p$boxh,
-           x1 = corner.x + .5*mod$x*p$boxw,
+    corner.x = xpos[proband] + .5*mod$x * boxw
+    corner.y = ypos[proband] +    mod$y * boxh
+    arrows(x0 = corner.x + 1.7*mod$x * boxw,
+           y0 = corner.y + 0.9*mod$y * boxh - 0.9*(1-mod$y) * boxh,
+           x1 = corner.x + 0.5*mod$x * boxw,
            y1 = corner.y,
-           lwd = 2, length = .15, xpd = NA)
+           lwd = 2*cex, length = .15, xpd = NA)
   }
 
   # Return plot parameters
