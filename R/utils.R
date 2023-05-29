@@ -11,6 +11,10 @@ isCount = function(x, minimum = 1) {
            x >= minimum)
 }
 
+isProb = function(x, len = NULL)
+  is.numeric(x) && (is.null(len) || length(x) == len) &&
+    all(!is.na(x) & x >= 0 & x <= 1)
+
 `%||%` = function(x, y) {
   if(is.null(x)) y else x
 }

@@ -27,27 +27,17 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
                            margins = 1, pos.geno = "bottom", pos.arrow = "bottomleft", ...) {
 
-  # Input checks
-  allids = c(proband, affected, unknown, carriers, noncarriers, homozygous)
-  if(any(!allids %in% labels(x)))
-    stop2("Unknown ID label: ", setdiff(allids, labels(x)))
-
-  if(length(err1 <- intersect(affected, unknown)))
-    stop2("Individual specified as both affected and unknown: ", err1)
-
-  if(length(err2 <- intersect(carriers, noncarriers)))
-    stop2("Individual specified as both a carrier and a non-carrier: ", err2)
-
-  if(length(err3 <- intersect(carriers, homozygous)))
-    stop2("Individual specified as both a (heterozygous) carrier and homozygous: ", err3)
-
-  if(length(err4 <- intersect(noncarriers, homozygous)))
-    stop2("Individual specified as both a non-carrier and homozygous: ", err4)
+  inputs = checkInput(x, affected = affected, unknown = unknown, proband = proband,
+                      carriers = carriers, homozygous = homozygous, noncarriers = noncarriers)
+  proband = inputs$proband
+  affected = inputs$affected
+  unknown = inputs$unknown
+  carriers = inputs$carriers
+  homozygous = inputs$homozygous
+  noncarriers = inputs$noncarriers
 
   hasProband = length(proband) > 0
 
-  if(hasProband && length(proband) > 1)
-    stop2("At most one proband is permitted")
 
   # Invoke automatic margin adjustment unless fully specified
   autoMargins = length(margins) < 4

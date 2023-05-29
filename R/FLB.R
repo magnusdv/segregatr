@@ -51,53 +51,25 @@
 #'     proband = 7, Xchrom = TRUE)
 #'
 #' @export
-FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
-               affected, unknown = NULL, proband,
+FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq = NULL,
+               affected = NULL, unknown = NULL, proband = NULL,
                penetrances, liability = NULL, loopBreakers = NULL, Xchrom = FALSE,
                details = FALSE, plot = FALSE, ...) {
 
-  ### Note to self: Don't mess with the order of input checks.
+  inputs = checkInput(x, affected = affected, unknown = unknown, proband = proband,
+                      carriers = carriers, homozygous = homozygous, noncarriers = noncarriers,
+                      freq = freq, Xchrom = Xchrom, requireProband = TRUE, requireFreq = TRUE)
+  proband = inputs$proband
+  affected = inputs$affected
+  unknown = inputs$unknown
+  carriers = inputs$carriers
+  homozygous = inputs$homozygous
+  noncarriers = inputs$noncarriers
 
-  if(!is.ped(x))
-    stop2("The first argument must be a `ped` object")
-
-  if(!is.null(x$LOOP_BREAKERS))
-    stop2("Pedigrees with pre-broken loops are not allowed as input to `FLB()`")
-
-  labs = labels(x)
-  males = which(x$SEX==1)
-
-  if(length(proband) == 0 || proband == "")
-    stop2("A proband must be specified")
-  if(!proband %in% labs)
-    stop2("Unknown proband: ", proband)
   if(!proband %in% affected)
     stop2("The proband must be affected")
   if(!proband %in% c(carriers, homozygous))
     stop2("The proband must be a carrier")
-
-  for(ids in list(proband, affected, unknown, carriers, homozygous, noncarriers)) {
-    validID = ids %in% labs
-    if(!all(validID))
-      stop2("Unknown ID label: ", ids[!validID])
-  }
-
-  if(length(err1 <- intersect(affected, unknown)))
-    stop2("Individual specified as both affected and unknown: ", err1)
-
-  if(length(err2 <- intersect(c(carriers, homozygous), noncarriers)))
-    stop2("Individual specified as both a carrier and a non-carrier: ", err2)
-
-  if(length(err3 <- intersect(carriers, homozygous)))
-    stop2("Individual specified as both heterozygous and homozygous carrier: ", err3)
-
-  if(Xchrom && length(err4 <- intersect(males, homozygous)))
-    stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err4)
-
-  if(missing(freq) || is.null(freq))
-    stop2("An allele frequency must be specified")
-  if(!is.numeric(freq) || length(freq) != 1 || is.na(freq) || freq <= 0 || freq >= 1)
-    stop2("The allele frequency must be a single number strictly between 0 and 1")
 
   if(plot) {
     plotSegregation(x, affected, unknown, proband, carriers, homozygous, noncarriers, ...)
@@ -229,3 +201,66 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq,
                 c(likM = likM, likMproband = likMproband, likDis = likDis)))
   FLB
 }
+
+
+
+
+checkInput = function(x, proband, affected, unknown, carriers, noncarriers,
+                      homozygous, freq = NULL, Xchrom = FALSE,
+                      requireProband = FALSE, requireFreq = FALSE) {
+
+  # Conversion to character unless NULL
+  asChar = function(v) if(!is.null(v)) as.character(v) else NULL
+
+  proband = asChar(proband)
+  affected = asChar(affected)
+  unknown = asChar(unknown)
+  carriers = asChar(carriers)
+  noncarriers = asChar(noncarriers)
+  homozygous = asChar(homozygous)
+
+  # Pedigree checks
+  if(!is.ped(x))
+    stop2("The first argument must be a connected pedigree")
+  if(!is.null(x$LOOP_BREAKERS))
+    stop2("Pedigrees with pre-broken loops are not allowed")
+
+  labs = labels(x)
+
+  # Proband checks
+  if(requireProband && (length(proband) == 0 || proband == ""))
+    stop2("A proband must be specified")
+  if(length(proband) > 1)
+    stop2("At most one proband is permitted")
+  if(length(proband) == 1 && !proband %in% labs)
+    stop2("Unknown proband: ", proband)
+
+  # Other input checks
+  allids = c(affected, unknown, carriers, noncarriers, homozygous)
+  if(any(!allids %in% labels(x)))
+    stop2("Unknown ID label: ", setdiff(allids, labs))
+
+  if(length(err1 <- intersect(affected, unknown)))
+    stop2("Individual specified as both affected and unknown: ", err1)
+
+  if(length(err2 <- intersect(carriers, noncarriers)))
+    stop2("Individual specified as both a carrier and a non-carrier: ", err2)
+
+  if(length(err3 <- intersect(carriers, homozygous)))
+    stop2("Individual specified as both a (heterozygous) carrier and homozygous: ", err3)
+
+  if(length(err4 <- intersect(noncarriers, homozygous)))
+    stop2("Individual specified as both homozygous and a non-carrier: ", err4)
+
+  if(Xchrom && length(err5 <- intersect(males(x), homozygous)))
+    stop2("Male individual specified as a homozygous carrier in an X-linked inheritance model: ", err5)
+
+  # Frequency checks
+  if(requireFreq && is.null(freq))
+      stop2("An allele frequency must be specified")
+  if(!is.null(freq) && !isProb(freq, len = 1))
+      stop2("The allele frequency must be a single number strictly between 0 and 1")
+
+
+  list(proband = proband, affected = affected, unknown = unknown, carriers = carriers,
+       noncarriers = noncarriers, homozygous = homozygous)
