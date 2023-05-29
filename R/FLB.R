@@ -5,9 +5,11 @@
 #'
 #' @param x A [pedtools::ped()] object.
 #' @param carriers A character vector (or coercible to such), containing the ID
-#'   labels of pedigree members known to carry one copy of the variant in question.
-#' @param homozygous A character vector (or coercible to such), containing the ID
-#'   labels of pedigree members known to carry two copies of the variant in question.
+#'   labels of pedigree members known to carry one copy of the variant in
+#'   question.
+#' @param homozygous A character vector (or coercible to such), containing the
+#'   ID labels of pedigree members known to carry two copies of the variant in
+#'   question.
 #' @param noncarriers A character vector (or coercible to such), containing the
 #'   ID labels of pedigree members known *not* to carry the variant in question.
 #' @param freq A single number strictly between 0 and 1: the population
@@ -16,13 +18,23 @@
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both
 #'   `carriers` and `affected`.
-#' @param penetrances For autosomal models, a numeric vector of length 3, corresponding to `(f0, f1, f2)`. It can also be a matrix or data frame with 3 columns where each row contains the penetrance values of a liability class.
-#'   For X-linked models, a list of two numeric vectors named `male` and `female`, of lengths 2 `(f0, f1)` and 3 `(f0, f1, f2)` respectively. Alternatively, each list entry may be a matrix or data frame (with the same number of columns) where each row represents a liability class.
-#' @param liability A vector of length `pedsize(x)`, containing for each pedigree member the row number of `penetrances` which should be used for that individual. (If `penetrances` is just a vector (or one for each sex in X-linked models), it will be used for all classes.) If `liability` is NULL (the default), it is set to `1` for all individuals.
+#' @param penetrances For autosomal models, a numeric vector of length 3,
+#'   corresponding to `(f0, f1, f2)`. It can also be a matrix or data frame with
+#'   3 columns where each row contains the penetrance values of a liability
+#'   class. For X-linked models, a list of two numeric vectors named `male` and
+#'   `female`, of lengths 2 `(f0, f1)` and 3 `(f0, f1, f2)` respectively.
+#'   Alternatively, each list entry may be a matrix or data frame (with the same
+#'   number of columns) where each row represents a liability class.
+#' @param liability A vector of length `pedsize(x)`, containing for each
+#'   pedigree member the row number of `penetrances` which should be used for
+#'   that individual. (If `penetrances` is just a vector (or one for each sex in
+#'   X-linked models), it will be used for all classes.) If `liability` is NULL
+#'   (the default), it is set to `1` for all individuals.
 #' @param loopBreakers (Relevant only if `x` has loops.) A vector of ID labels
 #'   indicating loop breakers. The default value (NULL) initiates automatic loop
 #'   breaking, which is recommended in most cases.
-#' @param Xchrom A logical, indicating if a model of X-linked inheritance should be applied.
+#' @param Xchrom A logical, indicating if a model of X-linked inheritance should
+#'   be applied.
 #' @param details A logical, indicating if detailed output should be returned
 #'   (for debugging purposes).
 #' @param plot A logical.

@@ -30,10 +30,12 @@ plotSegregation(
 \code{carriers} and \code{affected}.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry one copy of the variant in question.}
+labels of pedigree members known to carry one copy of the variant in
+question.}
 
-\item{homozygous}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry two copies of the variant in question.}
+\item{homozygous}{A character vector (or coercible to such), containing the
+ID labels of pedigree members known to carry two copies of the variant in
+question.}
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
