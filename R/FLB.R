@@ -77,7 +77,7 @@
 #' @export
 FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq = NULL,
                affected = NULL, unknown = NULL, proband = NULL,
-               penetrances, liability = NULL, loopBreakers = NULL, Xchrom = FALSE,
+               penetrances = NULL, liability = NULL, loopBreakers = NULL, Xchrom = FALSE,
                details = FALSE, plot = FALSE, ...) {
 
   inputs = checkInput(x, affected = affected, unknown = unknown, proband = proband,
@@ -153,18 +153,7 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
   aff[internalID(x, unknown)] = NA
 
   # Penetrances
-  if(missing(penetrances))
-    stop2("No penetrance values given")
-
-  if(Xchrom) {
-    if(!isTRUE(is.list(penetrances) && setequal(names(penetrances), c("male", "female"))))
-      stop2("For X-linked models, `penetrances` must be a list with elements `male` and `female`")
-    penetMat = list(male = fixPenetrances(penetrances$male, maleX = TRUE),
-                    female = fixPenetrances(penetrances$female, maleX = FALSE))
-  }
-  else {
-    penetMat = fixPenetrances(penetrances)
-  }
+  penetMat = penet2matrix(penetrances, Xchrom = Xchrom)
 
   # Liability classes
   if(is.null(liability))

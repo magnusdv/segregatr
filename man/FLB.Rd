@@ -13,7 +13,7 @@ FLB(
   affected = NULL,
   unknown = NULL,
   proband = NULL,
-  penetrances,
+  penetrances = NULL,
   liability = NULL,
   loopBreakers = NULL,
   Xchrom = FALSE,
