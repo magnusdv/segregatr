@@ -84,19 +84,31 @@ Computes the Bayes factor for co-segregation, as described by Thompson et al.
 }
 \examples{
 
+### Autosomal dominant
+
 x = nuclearPed(2)
+
 FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 
-x = nuclearPed(4)
-FLB(x, carriers = 4:5, homozygous = 3, noncarriers = 6, aff = 3, unknown = 1:2,
-    freq = 0.0001, penetrances = c(0.01, 0.01, 0.99), proband = 3)
 
-x = nuclearPed(3, sex = c(1, 1, 2))
-x = addChildren(x, mo = 5, sex = 1:2)
-FLB(x, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
+### Autosomal recessive with phenocopies and reduced penetrance
+
+y = nuclearPed(4)
+
+FLB(y, carriers = 4:5, homozygous = 3, noncarriers = 6,
+    aff = 3, unknown = 1:2, freq = 0.0001, proband = 3,
+    penetrances = c(0.01, 0.01, 0.99), plot = TRUE)
+
+
+### X-linked recessive
+
+z = nuclearPed(3, sex = c(1, 1, 2)) |>
+  addChildren(mother = 5, nch = 2, sex = 1:2)
+
+FLB(z, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
     freq = 0.0001, penetrances = list(male = c(0, 1), female = c(0, 0, 1)),
-    proband = 7, Xchrom = TRUE)
+    proband = 7, Xchrom = TRUE, plot = TRUE)
 
 }
 \references{
