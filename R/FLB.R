@@ -100,14 +100,17 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
   }
 
   # Empty marker and disease locus)
-  dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq), chrom = ifelse(Xchrom, 'X', NA))
+  dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq),
+                              chrom = ifelse(Xchrom, 'X', NA))
+
+  mls = males(x, internal = TRUE)
 
   # Full marker
   if(Xchrom) {
-    genotype(m, intersect(carriers, males)) = "b"
-    genotype(m, setdiff(carriers, males)) = c("a", "b")
-    genotype(m, intersect(noncarriers, males)) = "a"
-    genotype(m, setdiff(noncarriers, males)) = c("a", "a")
+    genotype(m, intersect(carriers, mls)) = "b"
+    genotype(m, setdiff(carriers, mls)) = c("a", "b")
+    genotype(m, intersect(noncarriers, mls)) = "a"
+    genotype(m, setdiff(noncarriers, mls)) = c("a", "a")
   } else {
     genotype(m, carriers) = c("a", "b")
     genotype(m, noncarriers) = c("a", "a")
@@ -170,8 +173,8 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
     stop2("Pedigree size (", pedsize(x), ") and assigned liability classes (", length(liability), ") must be equal")
 
   if(Xchrom) {
-    ilc_male = setdiff(liability[males], 1:nrow(penetMat$male))
-    ilc_female = setdiff(liability[-males], 1:nrow(penetMat$female))
+    ilc_male = setdiff(liability[mls], 1:nrow(penetMat$male))
+    ilc_female = setdiff(liability[-mls], 1:nrow(penetMat$female))
     if(length(ilc_male) | length(ilc_female))
       stop2("Illegal liability class:",
             if(length(ilc_male)) c(paste(" male", ilc_male[1]), ilc_male[-1]),
@@ -285,6 +288,6 @@ checkInput = function(x, proband, affected, unknown, carriers, noncarriers,
   if(!is.null(freq) && !isProb(freq, len = 1))
       stop2("The allele frequency must be a single number strictly between 0 and 1")
 
-
   list(proband = proband, affected = affected, unknown = unknown, carriers = carriers,
        noncarriers = noncarriers, homozygous = homozygous)
+}
