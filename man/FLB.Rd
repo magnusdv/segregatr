@@ -46,13 +46,11 @@ frequency of the observed allele.}
 \item{proband}{The ID label of the proband. This person must also be in both
 \code{carriers} and \code{affected}.}
 
-\item{penetrances}{For autosomal models, a numeric vector of length 3,
-corresponding to \verb{(f0, f1, f2)}. It can also be a matrix or data frame with
-3 columns where each row contains the penetrance values of a liability
-class. For X-linked models, a list of two numeric vectors named \code{male} and
-\code{female}, of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively.
-Alternatively, each list entry may be a matrix or data frame (with the same
-number of columns) where each row represents a liability class.}
+\item{penetrances}{For autosomal models, a numeric vector of length 3 \verb{(f0, f1, f2)}, or a matrix-like with 3 columns, where row \code{i} contains the
+penetrances of liability class \code{i}. For X-linked models, a list of two
+vectors named "male" and "female", of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively. Alternatively, each list entry may be matrix-like (with
+the same number of columns) where each row represents a liability
+class.}
 
 \item{liability}{A vector of length \code{pedsize(x)}, containing for each
 pedigree member the row number of \code{penetrances} which should be used for
@@ -75,12 +73,12 @@ be applied.}
 \item{...}{Optional plot parameters passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 }
 \value{
-A positive number. If \code{details = TRUE}, a list of intermediate
-results is returned.
+A positive number, the FLB score. If \code{details = TRUE}, a list
+including intermediate results.
 }
 \description{
-Computes the Bayes factor for co-segregation, as described by Thompson et al.
-(2003).
+Computes the Bayes factor for co-segregation, as originally described by
+Thompson et al. (2003).
 }
 \examples{
 

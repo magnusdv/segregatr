@@ -1,7 +1,7 @@
 #' Full-likelihood Bayes factor
 #'
-#' Computes the Bayes factor for co-segregation, as described by Thompson et al.
-#' (2003).
+#' Computes the Bayes factor for co-segregation, as originally described by
+#' Thompson et al. (2003).
 #'
 #' @param x A [pedtools::ped()] object.
 #' @param carriers A character vector (or coercible to such), containing the ID
@@ -18,13 +18,13 @@
 #' @param unknown Pedigree members with unknown affection status.
 #' @param proband The ID label of the proband. This person must also be in both
 #'   `carriers` and `affected`.
-#' @param penetrances For autosomal models, a numeric vector of length 3,
-#'   corresponding to `(f0, f1, f2)`. It can also be a matrix or data frame with
-#'   3 columns where each row contains the penetrance values of a liability
-#'   class. For X-linked models, a list of two numeric vectors named `male` and
-#'   `female`, of lengths 2 `(f0, f1)` and 3 `(f0, f1, f2)` respectively.
-#'   Alternatively, each list entry may be a matrix or data frame (with the same
-#'   number of columns) where each row represents a liability class.
+#' @param penetrances For autosomal models, a numeric vector of length 3 `(f0,
+#'   f1, f2)`, or a matrix-like with 3 columns, where row `i` contains the
+#'   penetrances of liability class `i`. For X-linked models, a list of two
+#'   vectors named "male" and "female", of lengths 2 `(f0, f1)` and 3 `(f0, f1,
+#'   f2)` respectively. Alternatively, each list entry may be matrix-like (with
+#'   the same number of columns) where each row represents a liability
+#'   class.
 #' @param liability A vector of length `pedsize(x)`, containing for each
 #'   pedigree member the row number of `penetrances` which should be used for
 #'   that individual. (If `penetrances` is just a vector (or one for each sex in
@@ -43,8 +43,9 @@
 #' @references Thompson D, Easton DF, Goldgar DE. *A full-likelihood method for
 #'   the evaluation of causality of sequence variants from family data.* Am J
 #'   Hum Genet, 2003. \doi{10.1086/378100}.
-#' @return A positive number. If `details = TRUE`, a list of intermediate
-#'   results is returned.
+#'
+#' @return A positive number, the FLB score. If `details = TRUE`, a list
+#'   including intermediate results.
 #'
 #' @examples
 #'
