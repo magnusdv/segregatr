@@ -99,35 +99,27 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
     plotSegregation(x, affected, unknown, proband, carriers, homozygous, noncarriers, ...)
   }
 
-  # Empty marker and disease locus)
-  dis = m = mProband = marker(x, afreq = c(a = 1 - freq, b = freq),
-                              chrom = ifelse(Xchrom, 'X', NA))
+  # Sex of carriers/noncarriers (needed for Xchrom)
+  caSex = getSex(x, carriers %||% character(0))    # safeguard against NULL
+  ncSex = getSex(x, noncarriers %||% character(0)) # safeguard against NULL
 
-  mls = males(x, internal = TRUE)
+  # Add marker objects: disease locus, main marker and proband genotype
+  locAttr = list(afreq = c(a = 1 - freq, b = freq),
+                 chrom = if(Xchrom) "X" else NA)
+  x = x |>
+    addMarker(name = "m", locusAttr = locAttr) |>
+    addMarker(name = "mProband", locusAttr = locAttr) |>
+    addMarker(name = "dis", locusAttr = locAttr) |>
+    setGenotype("m", carriers,    geno = ifelse(Xchrom & caSex == 1, "b", "a/b")) |>
+    setGenotype("m", noncarriers, geno = ifelse(Xchrom & ncSex == 1, "a", "a/a")) |>
+    setGenotype("m", homozygous, geno = "b/b")
 
-  # Full marker
-  if(Xchrom) {
-    genotype(m, intersect(carriers, mls)) = "b"
-    genotype(m, setdiff(carriers, mls)) = c("a", "b")
-    genotype(m, intersect(noncarriers, mls)) = "a"
-    genotype(m, setdiff(noncarriers, mls)) = c("a", "a")
-  } else {
-    genotype(m, carriers) = c("a", "b")
-    genotype(m, noncarriers) = c("a", "a")
-  }
-  genotype(m, homozygous) = c("b", "b")
-
-  # Proband marker
-  genotype(mProband, proband) = genotype(m, proband)
+  x = x |>
+    setGenotype("mProband", proband, geno = genotype(x, "m", proband))
 
   # Break loops if necessary
   if(hasUnbrokenLoops(x)) {
-    x = breakLoops(setMarkers(x, list(dis, m, mProband)), loopBreakers = loopBreakers, verbose = FALSE)
-
-    # Extract updated markers
-    dis = x$MARKERS[[1]]
-    m = x$MARKERS[[2]]
-    mProband = x$MARKERS[[3]]
+    x = breakLoops(x, loopBreakers = loopBreakers, verbose = FALSE)
 
     # Add duplicates to input vectors, were needed
     lb = x$ID[x$LOOP_BREAKERS[, 'orig']]
@@ -148,9 +140,9 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
   }
 
   # Affection status vector, sorted along labs
-  aff = logical(pedsize(x))
-  aff[internalID(x, affected)] = TRUE
-  aff[internalID(x, unknown)] = NA
+  affvec = logical(pedsize(x))
+  affvec[internalID(x, affected)] = TRUE
+  affvec[internalID(x, unknown)] = NA
 
   # Penetrances
   penetMat = penet2matrix(penetrances, Xchrom = Xchrom)
@@ -162,6 +154,8 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
     stop2("Pedigree size (", pedsize(x), ") and assigned liability classes (", length(liability), ") must be equal")
 
   if(Xchrom) {
+    mls = males(x, internal = TRUE)
+
     ilc_male = setdiff(liability[mls], 1:nrow(penetMat$male))
     ilc_female = setdiff(liability[-mls], 1:nrow(penetMat$female))
     if(length(ilc_male) | length(ilc_female))
@@ -181,17 +175,21 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
 
   if(Xchrom) {
     peeler = function(x, locus) function(dat, sub) pedprobr:::.peel_M_X(dat, sub, SEX = x$SEX)
-    startCausal = function(x, locus) startdata_causative_X(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+    startCausal = function(x, locus) startdata_causative_X(x, locus, aff = affvec, penetMat = penetMat, liability = liability)
   }
   else {
     peeler = function(x, locus) function(dat, sub) pedprobr:::.peel_M_AUT(dat, sub)
-    startCausal = function(x, locus) startdata_causative(x, locus, aff = aff, penetMat = penetMat, liability = liability)
+    startCausal = function(x, locus) startdata_causative(x, locus, aff = affvec, penetMat = penetMat, liability = liability)
   }
 
   likelihoodCausal = function(x, locus) {
     peelingProcess(x, locus, startdata = startCausal,
                    peeler = peeler(x, locus), peelOrder = peelOrder)
   }
+
+  dis = getMarkers(x, "dis")[[1]]
+  m = getMarkers(x, "m")[[1]]
+  mProband = getMarkers(x, "mProband")[[1]]
 
   # Main Bayes factor
   numer1 = likelihoodCausal(x, m)
