@@ -1,6 +1,6 @@
 Package: segregatr
 Title: Segregation Analysis for Variant Interpretation
-Version: 0.2.0.9000
+Version: 0.2.0.9100
 Authors@R: 
     c(person(given = "Magnus Dehli",
            family = "Vigeland",
@@ -23,7 +23,7 @@ BugReports: https://github.com/magnusdv/segregatr/issues
 Encoding: UTF-8
 Language: en-GB
 Depends: 
-    pedtools (>= 2.1.1),
+    pedtools (>= 2.2.0),
     R (>= 4.1.0)
 Imports: 
     pedprobr
