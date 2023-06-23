@@ -95,10 +95,11 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
     stop2("The proband must be affected")
   if(!proband %in% c(carriers, homozygous))
     stop2("The proband must be a carrier")
+  if(!is.null(x$LOOP_BREAKERS))
+    stop2("Pedigrees with pre-broken loops are not allowed")
 
-  if(plot) {
+  if(plot)
     plotSegregation(x, affected, unknown, proband, carriers, homozygous, noncarriers, ...)
-  }
 
   # Sex of carriers/noncarriers (needed for Xchrom)
   caSex = getSex(x, carriers %||% character(0))    # safeguard against NULL
@@ -224,6 +225,9 @@ checkInput = function(x, proband, affected, unknown, carriers, noncarriers,
                       homozygous, freq = NULL, Xchrom = FALSE,
                       requireProband = FALSE, requireFreq = FALSE) {
 
+  if(!is.ped(x))
+    stop2("The first argument must be a connected pedigree")
+
   # Conversion to character unless NULL
   asChar = function(v) if(!is.null(v)) as.character(v) else NULL
 
@@ -234,26 +238,18 @@ checkInput = function(x, proband, affected, unknown, carriers, noncarriers,
   noncarriers = asChar(noncarriers)
   homozygous = asChar(homozygous)
 
-  # Pedigree checks
-  if(!is.ped(x))
-    stop2("The first argument must be a connected pedigree")
-  if(!is.null(x$LOOP_BREAKERS))
-    stop2("Pedigrees with pre-broken loops are not allowed")
-
-  labs = labels(x)
-
   # Proband checks
   if(requireProband && (length(proband) == 0 || proband == ""))
     stop2("A proband must be specified")
   if(length(proband) > 1)
     stop2("At most one proband is permitted")
-  if(length(proband) == 1 && !proband %in% labs)
+  if(length(proband) == 1 && !proband %in% x$ID)
     stop2("Unknown proband: ", proband)
 
   # Other input checks
   allids = c(affected, unknown, carriers, noncarriers, homozygous)
-  if(any(!allids %in% labels(x)))
-    stop2("Unknown ID label: ", setdiff(allids, labs))
+  if(any(!allids %in% x$ID))
+    stop2("Unknown ID label: ", setdiff(allids, x$ID))
 
   if(length(err1 <- intersect(affected, unknown)))
     stop2("Individual specified as both affected and unknown: ", err1)

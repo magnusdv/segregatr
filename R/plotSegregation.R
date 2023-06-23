@@ -11,17 +11,33 @@
 #'
 #' @examples
 #'
-#' x = cousinPed(1)
-#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
-#'                 homozygous = 8, noncarriers = 6:7, proband = 8)
+#' x = nuclearPed(2)
+#' plotSegregation(x, proband = 3, carriers = 3:4, noncarriers = 1,
+#'                 aff = 3:4, unknown = 1:2)
 #'
-#' # Different placement of genotypes and proband arrow
-#' plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
-#'                 homozygous = 8, noncarriers = 6:7, proband = 8,
+#' # Same with various options
+#' plotSegregation(x, proband = 3, carriers = 3:4, noncarriers = 1,
+#'                 aff = 3:4, unknown = 1:2,
+#'                 pos.geno = "topright", pos.arrow = "topleft",
+#'                 labs = NULL, title = "Family 1", cex.main = 1.5)
+#'
+#' # Recessive example
+#' y = cousinPed(1, child = TRUE)
+#' plotSegregation(y, affected = 9, unknown = 1:6, carrier = 7:8,
+#'                 homozygous = 9, noncarriers = c(4,6), proband = 9)
+#'
+#' # Different symbol placements
+#' plotSegregation(y, affected = 9, unknown = 1:6, carrier = 7:8,
+#'                 homozygous = 9, noncarriers = c(4,6), proband = 9,
+#'                 pos.geno = "topleft", pos.arrow = "bottomright")
+#'
+#' # Incest case
+#' y = nuclearPed() |> addChildren(father = 3, mother = 2, nch = 3)
+#'
+#' plotSegregation(y, proband = 4, aff = 4:6, unknown = 2, carrier = 4:6, deceased = 1,
 #'                 pos.geno = "topleft", pos.arrow = "bottomright")
 #'
 #' @importFrom graphics arrows strheight text
-#' @importFrom utils packageVersion
 #' @export
 plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
                            carriers = NULL, homozygous = NULL, noncarriers = NULL, cex = 1,
@@ -41,17 +57,18 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   pos.geno = match.arg(pos.geno, c("bottom", "topleft", "topright"))
   pos.arrow = match.arg(pos.arrow, c("bottomleft", "bottomright", "topleft", "topright"))
 
+  # Question mark inside those with unknown affection status
+  qm = rep_len("?", length(unknown))
+  names(qm) = unknown
+
   # Main alignment
   align = .pedAlignment(x, ...)
   xpos = align$x
   ypos = align$y
-  names(xpos) = names(ypos) = labels(x)
+  names(xpos) = names(ypos) = x$ID
 
-  # Invoke automatic margin adjustment unless fully specified
-  autoMargins = length(margins) < 4
-
-  # Adjust margins to fit arrow and genotypes
-  if(autoMargins) {
+  # Invoke automatic margin adjustment if not fully specified
+  if(autoMargins <- length(margins) < 4) {
     margins = rep_len(margins, 4)
     xr = align$xrange
     yr = align$yrange
@@ -87,13 +104,9 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
     margins = margins + extraMargins
   }
 
-  p = plot(x,
-           aff = affected,
-           textInside = ifelse(1:pedsize(x) %in% unknown, "?", ""),
-           cex = cex,
-           margins = margins,
-           keep.par = TRUE,
-           ...)
+  # Plot pedigree
+  p = plot(x, aff = affected, textInside = qm, cex = cex,
+           margins = margins, keep.par = TRUE, ...)
 
   boxw = p$scaling$boxw
   boxh = p$scaling$boxh
@@ -115,7 +128,7 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   if(!is.null(noncarriers))
     text(xpos[noncarriers], ypos[noncarriers] + vdist, labels = "-", cex = cex*1.5, font = 1, pos = lpos[2], offset = lpos[3])
 
-  # proband arrow
+  # Proband arrow
   if(hasProband) {
     mod = switch(pos.arrow,
            bottomleft = list(x = -1, y = 1),
