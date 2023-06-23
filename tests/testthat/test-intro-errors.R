@@ -2,13 +2,10 @@
 nuc = nuclearPed(1)
 cous = cousinPed(1, child = TRUE)
 
-penetXR = list(male = c(0, 1),
-               female = c(0, 0, 1))
-
 test_that("FLB() catches errors", {
 
   # Loops
-  expect_error(FLB(breakLoops(cous, verbose = FALSE)),
+  expect_error(FLB(breakLoops(cous, verbose = FALSE), proband = 9, aff = 9, carriers = 9, freq = 0.001),
                "Pedigrees with pre-broken loops are not allowed", fixed = TRUE)
   expect_error(FLB(cous, proband = 9, aff = 9, carriers = 9, freq = 0.001, liability = rep(1,9)),
                "Liability classes are not yet implemented when `x` has loops")
@@ -45,23 +42,23 @@ test_that("FLB() catches errors", {
   expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001),
                "No penetrance values given")
 
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = c(0, 0, 1), Xchrom = TRUE),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "AR", Xchrom = TRUE),
                "For X-linked models, `penetrances` must be a list with elements `male` and `female`")
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = list(c(0, 1), c(0, 0, 1)), Xchrom = TRUE),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = list(m=c(0,1), f=c(0,1,1)), Xchrom = TRUE),
                "For X-linked models, `penetrances` must be a list with elements `male` and `female`")
 
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = c(0, 0, 1), liability = c(1,1)),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "AR", liability = c(1,1)),
                "Pedigree size (3) and assigned liability classes (2) must be equal", fixed = TRUE)
-  expect_error(FLB(nuclearPed(3), proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = c(0, 0, 1), liability = 1),
+  expect_error(FLB(nuclearPed(3), proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "AR", liability = 1),
                "Pedigree size (5) and assigned liability classes (1) must be equal", fixed = TRUE)
 
 
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = penetXR, liability = c(1,1,2), Xchrom = TRUE),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "XR", liability = c(1,1,2), Xchrom = TRUE),
                "Illegal liability class: male 2")
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = penetXR, liability = c(1,3,1), Xchrom = TRUE),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "XR", liability = c(1,3,1), Xchrom = TRUE),
                "Illegal liability class: female 3")
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = penetXR, liability = c(2,2,2), Xchrom = TRUE),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "XR", liability = c(2,2,2), Xchrom = TRUE),
                "Illegal liability class: male 2; female 2")
-  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = c(0, 0, 1), liability = c(1,1,2)),
+  expect_error(FLB(nuc, proband = 1, aff = 1, carriers = 1, freq = 0.001, penetrances = "AR", liability = c(1,1,2)),
                "Illegal liability class: 2")
 })
