@@ -22,8 +22,7 @@ You can install **segregatr** from CRAN as follows:
 install.packages("segregatr")
 ```
 
-Alternatively, you can obtain the latest development version from
-GitHub:
+Alternatively, obtain the latest development version from GitHub:
 
 ``` r
 devtools::install_github("magnusdv/segregatr")
@@ -31,23 +30,25 @@ devtools::install_github("magnusdv/segregatr")
 
 ## Example
 
-We start by loading **segregatr**:
-
 ``` r
 library(segregatr)
-#> Loading required package: pedtools
 ```
 
 The family below shows four brothers, all affected with a rare dominant
 disease with 90% penetrance and phenocopy rate 1%. The parents have
 unknown affection status. All four brothers are shown to carry a
-candidate variant, warranting a segregation analysis. pathogenic
-variant.
+candidate variant.
 
-<img src="man/figures/README-sibex-1.png" width="35%" style="display: block; margin: auto;" />
+<img src="man/figures/README-sibex-1.png" width="40%" style="display: block; margin: auto;" />
 
-In order to compute the full-likelihood Bayes factor, we first create
-the pedigree.
+We will use **segregatr** to analyse the co-segregation of the variant
+and the disease in this pedigree. Specifically we want to compute the
+*full-likelihood Bayes factor* (FLB), quantifying the evidence that the
+variant is pathogenic.
+
+To create the pedigree we use the `nuclearPed()` function from the
+**pedtools** package, which is automatically loaded together with
+**segregatr**.
 
 ``` r
 x = nuclearPed(4)
@@ -56,9 +57,10 @@ x = nuclearPed(4)
 Then we run the `FLB()` function, filling in the necessary data:
 
 ``` r
-FLB(x, carriers = 3:6, aff = 3:6, unknown = 1:2,
+FLB(x, carriers = 3:6, affected = 3:6, unknown = 1:2,
     freq = 0.0001, penetrances = c(0.01, 0.9, 0.9), proband = 3)
 #> [1] 7.732161
 ```
 
-The answer indicates only suggestive evidence for pathogenicity.
+The resulting FLB score is less than 8, which unfortunately only
+indicates suggestive evidence for pathogenicity.
