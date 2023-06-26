@@ -1,6 +1,6 @@
 Package: segregatr
 Title: Segregation Analysis for Variant Interpretation
-Version: 0.2.0.9100
+Version: 0.3.0
 Authors@R: 
     c(person(given = "Magnus Dehli",
            family = "Vigeland",
