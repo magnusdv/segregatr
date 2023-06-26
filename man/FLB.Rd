@@ -9,11 +9,11 @@ FLB(
   carriers = NULL,
   homozygous = NULL,
   noncarriers = NULL,
-  freq,
-  affected,
+  freq = NULL,
+  affected = NULL,
   unknown = NULL,
-  proband,
-  penetrances,
+  proband = NULL,
+  penetrances = NULL,
   liability = NULL,
   loopBreakers = NULL,
   Xchrom = FALSE,
@@ -26,10 +26,12 @@ FLB(
 \item{x}{A \code{\link[pedtools:ped]{pedtools::ped()}} object.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry one copy of the variant in question.}
+labels of pedigree members known to carry one copy of the variant in
+question.}
 
-\item{homozygous}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry two copies of the variant in question.}
+\item{homozygous}{A character vector (or coercible to such), containing the
+ID labels of pedigree members known to carry two copies of the variant in
+question.}
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
@@ -44,16 +46,24 @@ frequency of the observed allele.}
 \item{proband}{The ID label of the proband. This person must also be in both
 \code{carriers} and \code{affected}.}
 
-\item{penetrances}{For autosomal models, a numeric vector of length 3, corresponding to \verb{(f0, f1, f2)}. It can also be a matrix or data frame with 3 columns where each row contains the penetrance values of a liability class.
-For X-linked models, a list of two numeric vectors named \code{male} and \code{female}, of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively. Alternatively, each list entry may be a matrix or data frame (with the same number of columns) where each row represents a liability class.}
+\item{penetrances}{For autosomal models, a numeric vector of length 3 \verb{(f0, f1, f2)}, or a matrix-like with 3 columns, where row \code{i} contains the
+penetrances of liability class \code{i}. For X-linked models, a list of two
+vectors named "male" and "female", of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively. Alternatively, each list entry may be matrix-like (with
+the same number of columns) where each row represents a liability
+class.}
 
-\item{liability}{A vector of length \code{pedsize(x)}, containing for each pedigree member the row number of \code{penetrances} which should be used for that individual. (If \code{penetrances} is just a vector (or one for each sex in X-linked models), it will be used for all classes.) If \code{liability} is NULL (the default), it is set to \code{1} for all individuals.}
+\item{liability}{A vector of length \code{pedsize(x)}, containing for each
+pedigree member the row number of \code{penetrances} which should be used for
+that individual. (If \code{penetrances} is just a vector (or one for each sex in
+X-linked models), it will be used for all classes.) If \code{liability} is NULL
+(the default), it is set to \code{1} for all individuals.}
 
 \item{loopBreakers}{(Relevant only if \code{x} has loops.) A vector of ID labels
 indicating loop breakers. The default value (NULL) initiates automatic loop
 breaking, which is recommended in most cases.}
 
-\item{Xchrom}{A logical, indicating if a model of X-linked inheritance should be applied.}
+\item{Xchrom}{A logical, indicating if a model of X-linked inheritance should
+be applied.}
 
 \item{details}{A logical, indicating if detailed output should be returned
 (for debugging purposes).}
@@ -63,28 +73,40 @@ breaking, which is recommended in most cases.}
 \item{...}{Optional plot parameters passed on to \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 }
 \value{
-A positive number. If \code{details = TRUE}, a list of intermediate
-results is returned.
+A positive number, the FLB score. If \code{details = TRUE}, a list
+including intermediate results.
 }
 \description{
-Computes the Bayes factor for co-segregation, as described by Thompson et al.
-(2003).
+Computes the Bayes factor for co-segregation, as originally described by
+Thompson et al. (2003).
 }
 \examples{
 
+### Autosomal dominant
+
 x = nuclearPed(2)
+
 FLB(x, carriers = 3:4, aff = 3:4, unknown = 1:2,
     freq = 0.0001, penetrances = c(0, 1, 1), proband = 3)
 
-x = nuclearPed(4)
-FLB(x, carriers = 4:5, homozygous = 3, noncarriers = 6, aff = 3, unknown = 1:2,
-    freq = 0.0001, penetrances = c(0.01, 0.01, 0.99), proband = 3)
 
-x = nuclearPed(3, sex = c(1, 1, 2))
-x = addChildren(x, mo = 5, sex = 1:2)
-FLB(x, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
+### Autosomal recessive with phenocopies and reduced penetrance
+
+y = nuclearPed(4)
+
+FLB(y, carriers = 4:5, homozygous = 3, noncarriers = 6,
+    aff = 3, unknown = 1:2, freq = 0.0001, proband = 3,
+    penetrances = c(0.01, 0.01, 0.99), plot = TRUE)
+
+
+### X-linked recessive
+
+z = nuclearPed(3, sex = c(1, 1, 2)) |>
+  addChildren(mother = 5, nch = 2, sex = 1:2)
+
+FLB(z, carriers = c(3, 7), nonc = 4, aff = c(3, 7), unknown = 1:2,
     freq = 0.0001, penetrances = list(male = c(0, 1), female = c(0, 0, 1)),
-    proband = 7, Xchrom = TRUE)
+    proband = 7, Xchrom = TRUE, plot = TRUE)
 
 }
 \references{

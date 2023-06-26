@@ -30,10 +30,12 @@ plotSegregation(
 \code{carriers} and \code{affected}.}
 
 \item{carriers}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry one copy of the variant in question.}
+labels of pedigree members known to carry one copy of the variant in
+question.}
 
-\item{homozygous}{A character vector (or coercible to such), containing the ID
-labels of pedigree members known to carry two copies of the variant in question.}
+\item{homozygous}{A character vector (or coercible to such), containing the
+ID labels of pedigree members known to carry two copies of the variant in
+question.}
 
 \item{noncarriers}{A character vector (or coercible to such), containing the
 ID labels of pedigree members known \emph{not} to carry the variant in question.}
@@ -53,13 +55,30 @@ Plots a pedigree showing the segregation of a variant.
 }
 \examples{
 
-x = cousinPed(1)
-plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
-                homozygous = 8, noncarriers = 6:7, proband = 8)
+x = nuclearPed(2)
+plotSegregation(x, proband = 3, carriers = 3:4, noncarriers = 1,
+                aff = 3:4, unknown = 1:2)
 
-# Different placement of genotypes and proband arrow
-plotSegregation(x, affected = c(3,6,8), unknown = 1, carrier = 2:5,
-                homozygous = 8, noncarriers = 6:7, proband = 8,
+# Same with various options
+plotSegregation(x, proband = 3, carriers = 3:4, noncarriers = 1,
+                aff = 3:4, unknown = 1:2,
+                pos.geno = "topright", pos.arrow = "topleft",
+                labs = NULL, title = "Family 1", cex.main = 1.5)
+
+# Recessive example
+y = cousinPed(1, child = TRUE)
+plotSegregation(y, affected = 9, unknown = 1:6, carrier = 7:8,
+                homozygous = 9, noncarriers = c(4,6), proband = 9)
+
+# Different symbol placements
+plotSegregation(y, affected = 9, unknown = 1:6, carrier = 7:8,
+                homozygous = 9, noncarriers = c(4,6), proband = 9,
+                pos.geno = "topleft", pos.arrow = "bottomright")
+
+# Incest case
+y = nuclearPed() |> addChildren(father = 3, mother = 2, nch = 3)
+
+plotSegregation(y, proband = 4, aff = 4:6, unknown = 2, carrier = 4:6, deceased = 1,
                 pos.geno = "topleft", pos.arrow = "bottomright")
 
 }
