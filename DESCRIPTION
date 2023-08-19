@@ -1,27 +1,21 @@
 Package: segregatr
 Title: Segregation Analysis for Variant Interpretation
 Version: 0.3.0
-Authors@R: 
-    c(person(given = "Magnus Dehli",
-           family = "Vigeland",
-           role = c("aut", "cre"),
-           email = "m.d.vigeland@medisin.uio.no",
+Authors@R: c(
+    person("Magnus Dehli", "Vigeland", , "m.d.vigeland@medisin.uio.no", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9134-4962")),
-    person(given = "Christian",
-           family = "Carrizosa",
-           role = "aut",
-           comment = c(ORCID = "0000-0002-3919-0011")))
-Description: An implementation of the full-likelihood Bayes factor (FLB) 
-    for evaluating segregation evidence in clinical medical genetics. The method 
-    was introduced by Thompson et al. (2003) <doi:10.1086/378100>, and further 
-    popularised by Bayrak-Toydemir et al. (2008) <doi:10.1016/j.yexmp.2008.03.006>.
-    This implementation allows custom penetrance values and liability classes, and 
-    includes specialised pedigree visualisations.
+    person("Christian", "Carrizosa", role = "aut",
+           comment = c(ORCID = "0000-0002-3919-0011"))
+  )
+Description: An implementation of the full-likelihood Bayes factor (FLB)
+    for evaluating segregation evidence in clinical medical genetics. The
+    method was introduced by Thompson et al. (2003) <doi:10.1086/378100>.
+    This implementation supports custom penetrance values and liability
+    classes, and allows visualisations and robustness analysis as
+    presented in Ratajska et al. (2023) <doi:10.1002/mgg3.2107>.
 License: GPL-3
 URL: https://github.com/magnusdv/segregatr
 BugReports: https://github.com/magnusdv/segregatr/issues
-Encoding: UTF-8
-Language: en-GB
 Depends: 
     pedtools (>= 2.2.0),
     R (>= 4.1.0)
@@ -29,5 +23,7 @@ Imports:
     pedprobr
 Suggests: 
     testthat
+Encoding: UTF-8
+Language: en-GB
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

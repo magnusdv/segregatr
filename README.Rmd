@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![](https://cranlogs.r-pkg.org/badges/last-month/segregatr?color=yellow)](https://cran.r-project.org/package=segregatr)
 <!-- badges: end -->
 
-The goal of **segregatr** is to provide segregation analysis for clinical variant classification.
+The goal of **segregatr** is to provide segregation analysis for clinical variant classification. For a real-case diagnostic application of the package, see Ratajska et al (2023). [The use of segregation analysis in interpretation of sequence variants in SMAD3](https://doi.org/10.1002/mgg3.2107).
 
 ## Installation
 
@@ -44,9 +44,9 @@ library(segregatr)
 
 The family below shows four brothers, all affected with a rare dominant disease with 90% penetrance and phenocopy rate 1%. The parents have unknown affection status. All four brothers are shown to carry a candidate variant.
 
-```{r sibex, echo = F, results = F, fig.height = 2.4, fig.width = 3, out.width = "40%"}
+```{r sibex, echo = F, results = F, fig.height = 2.4, fig.width = 3.5, out.width = "45%"}
 x = nuclearPed(4)
-plotSegregation(x, affected = 3:6, unknown = 1:2, proband = 3, carriers = 3:6, margins = 1.5)
+plotSegregation(x, affected = 3:6, unknown = 1:2, proband = 3, carriers = 3:6)
 ```
 
 We will use **segregatr** to analyse the co-segregation of the variant and the disease in this pedigree. Specifically we want to compute the *full-likelihood Bayes factor* (FLB), quantifying the evidence that the variant is pathogenic.
@@ -63,4 +63,4 @@ FLB(x, carriers = 3:6, affected = 3:6, unknown = 1:2,
     freq = 0.0001, penetrances = c(0.01, 0.9, 0.9), proband = 3)
 ```
 
-The resulting FLB score is less than 8, which unfortunately only indicates suggestive evidence for pathogenicity.
+The resulting FLB score amounts to *suggestive evidence* for pathogenicity, according to the thresholds suggested by [Jarvik and Browning (2016)](https://doi.org/10.1016/j.ajhg.2016.04.003).
