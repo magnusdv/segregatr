@@ -23,11 +23,11 @@
 #'   penetrances of liability class `i`. For X-linked models, a list of two
 #'   vectors named "male" and "female", of lengths 2 `(f0, f1)` and 3 `(f0, f1,
 #'   f2)` respectively. Alternatively, each list entry may be matrix-like (with
-#'   the same number of columns) where each row represents a liability
-#'   class.
+#'   the same number of columns) where each row represents a liability class.
 #' @param liability A vector of length `pedsize(x)`, containing for each
 #'   pedigree member the row number of `penetrances` which should be used for
-#'   that individual. (If `penetrances` is just a vector (or one for each sex in
+#'   that individual. If unnamed, it is assumed that the individuals are taken
+#'   in order. (If `penetrances` is just a vector (or one for each sex in
 #'   X-linked models), it will be used for all classes.) If `liability` is NULL
 #'   (the default), it is set to `1` for all individuals.
 #' @param loopBreakers (Relevant only if `x` has loops.) A vector of ID labels
@@ -101,6 +101,19 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
   if(plot)
     plotSegregation(x, affected, unknown, proband, carriers, homozygous, noncarriers, ...)
 
+  # Ensure liability is a named integer vector of length pedsize
+  if(is.null(liability))
+    liability = rep_len(1, pedsize(x))
+  else if(length(liability) == 1)
+    liability = rep_len(liability, pedsize(x))
+  else if(length(liability) != pedsize(x))
+    stop2(sprintf("Length of `liability` vector must be 1 or %d: ", pedsize(x)), liability)
+
+  if(is.null(names(liability)))
+    names(liability) = x$ID
+  else if(!setequal(names(liability), x$ID))
+    stop2("Unknown ID in names of liability vector: ", setdiff(names(liability), x$ID))
+
   # Sex of carriers/noncarriers (needed for Xchrom)
   caSex = getSex(x, carriers %||% character(0))    # safeguard against NULL
   ncSex = getSex(x, noncarriers %||% character(0)) # safeguard against NULL
@@ -132,9 +145,10 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
     if(length(lbUn <- intersect(unknown, lb)))
       unknown = unique.default(c(unknown, paste0("=", lbUn)))
 
-    # TODO: Fix this (easy)
-    if(!is.null(liability))
-      stop2("Liability classes are not yet implemented when `x` has loops")
+    # Extend liability vector
+    # Note: The liab-classes for copies do not actually matter,
+    # since their `prob` entry is reset to 1's in peelingProcess()
+    liability = c(liability, `names<-`(liability[lb], paste0("=", lb)))
 
     # TODO: Handle proband vs loop breaking better
     if(proband %in% lb)
@@ -149,27 +163,22 @@ FLB = function(x, carriers = NULL, homozygous = NULL, noncarriers = NULL, freq =
   # Penetrances
   penetMat = penet2matrix(penetrances, Xchrom = Xchrom)
 
-  # Liability classes
-  if(is.null(liability))
-    liability = rep_len(1, pedsize(x))
-  else if(length(liability) != pedsize(x))
-    stop2("Pedigree size (", pedsize(x), ") and assigned liability classes (", length(liability), ") must be equal")
-
+  # Check that liability classes are valid row numbers in penetMat
   if(Xchrom) {
-    mls = males(x, internal = TRUE)
+    mls = males(x) # internal = FALSE; using names now!
+    fem = setdiff(x$ID, mls) # safer than females(x)
 
-    ilc_male = setdiff(liability[mls], 1:nrow(penetMat$male))
-    ilc_female = setdiff(liability[-mls], 1:nrow(penetMat$female))
-    if(length(ilc_male) | length(ilc_female))
-      stop2("Illegal liability class:",
-            if(length(ilc_male)) c(paste(" male", ilc_male[1]), ilc_male[-1]),
-            if(length(ilc_male) && length(ilc_female)) ";",
-            if(length(ilc_female)) c(paste(" female", ilc_female[1]), ilc_female[-1]))
+    liabM = liability[mls]
+    liabF = liability[fem]
+    if(!all(liabM %in% 1:nrow(penetMat$male)))
+      stop2("Illegal liability class (males): ", setdiff(liabM, 1:nrow(penetMat$male)))
+    if(!all(liabF %in% 1:nrow(penetMat$female)))
+      stop2("Illegal liability class (females): ", setdiff(liabF, 1:nrow(penetMat$female)))
   }
-  else
+  else {
     if(!all(liability %in% 1:nrow(penetMat)))
       stop2("Illegal liability class: ", setdiff(liability, 1:nrow(penetMat)))
-
+  }
 
   # Setup for likelihood under causal hypothesis
   peelOrder = peelingOrder(x)

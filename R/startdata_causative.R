@@ -22,8 +22,9 @@ startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
     g = glist[[i]]
 
-    # Penetrance values
-    liab = liability[i]
+    # Penetrance values: Liability class = row of penetMat
+    lab = x$ID[i]
+    liab = liability[[lab]]
     penet = as.numeric(penetMat[liab, ])
 
     # Affection status priors
