@@ -553,3 +553,15 @@ test_that("Some quick checks for pedigrees with loops", {
 
 })
 
+
+test_that("Loops & liabilities", {
+  skip()
+  x = cousinPed(degree = 0, half = T, child = TRUE) |> addSon(4:5)
+  FLB(x, carriers = c(1,4,6,7), aff = c(1,4,6,7), nonc = c(2:3,5), freq = 0.001,
+      penetrances = c(0,1,1), proband = 6, plot = T)
+
+  y = linearPed(2) |> addSon(3:4)
+  FLB(y, carriers = c(1,3,5,6), aff = c(1,3,5,6), nonc = c(2,4), freq = 0.001,
+      penetrances = c(0,1,1), proband = 5, plot = T)
+
+})
