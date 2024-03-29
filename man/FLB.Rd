@@ -49,12 +49,12 @@ frequency of the observed allele.}
 \item{penetrances}{For autosomal models, a numeric vector of length 3 \verb{(f0, f1, f2)}, or a matrix-like with 3 columns, where row \code{i} contains the
 penetrances of liability class \code{i}. For X-linked models, a list of two
 vectors named "male" and "female", of lengths 2 \verb{(f0, f1)} and 3 \verb{(f0, f1, f2)} respectively. Alternatively, each list entry may be matrix-like (with
-the same number of columns) where each row represents a liability
-class.}
+the same number of columns) where each row represents a liability class.}
 
 \item{liability}{A vector of length \code{pedsize(x)}, containing for each
 pedigree member the row number of \code{penetrances} which should be used for
-that individual. (If \code{penetrances} is just a vector (or one for each sex in
+that individual. If unnamed, it is assumed that the individuals are taken
+in order. (If \code{penetrances} is just a vector (or one for each sex in
 X-linked models), it will be used for all classes.) If \code{liability} is NULL
 (the default), it is set to \code{1} for all individuals.}
 

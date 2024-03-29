@@ -1,9 +1,11 @@
 
 startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
+  nInd = pedsize(x)
+
   # Founder data
   FOU = founders(x, internal = TRUE)
-  FOU_INB = rep(NA_real_, pedsize(x))
+  FOU_INB = rep(NA_real_, nInd)
   FOU_INB[FOU] = founderInbreeding(x) # enable quick lookup
 
   # Allele frequencies (used in HW below)
@@ -11,19 +13,16 @@ startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
   # Build genotype list in internal format
   glist = pedprobr:::.buildGenolist(x, marker, eliminate = 2)
-  impossible = attr(glist, "impossible")
 
-  # Loop through individuals
-  dat = lapply(1:pedsize(x), function(i) {
+  if(attr(glist, "impossible"))
+    return(glist)
 
-    # If impossible, finish loop quickly (cannot use break in `apply()`)
-    if(impossible)
-      return(NULL)
-
+  for(i in 1:nInd) {
     g = glist[[i]]
 
-    # Penetrance values
-    liab = liability[i]
+    # Penetrance values: Liability class = row of penetMat
+    lab = x$ID[i]
+    liab = liability[[lab]]
     penet = as.numeric(penetMat[liab, ])
 
     # Affection status priors
@@ -43,21 +42,22 @@ startdata_causative = function(x, marker, aff, penetMat, liability = NULL) {
 
     # Remove impossible entries
     keep = prob > 0
-    if(!any(keep)) {
-      impossible = TRUE
-      return(NULL)
-    }
-
     if(!all(keep)) {
       g$pat = g$pat[keep]
       g$mat = g$mat[keep]
       prob = prob[keep]
     }
-
     g$prob = prob
-    g
-  })
 
-  attr(dat, "impossible") = impossible
-  dat
+    # Update entry
+    glist[[i]] = g
+
+    # If impossible: break
+    if(!any(keep)) {
+      attr(glist, "impossible") = TRUE
+      break
+    }
+  }
+
+  glist
 }
