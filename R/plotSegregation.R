@@ -68,7 +68,7 @@ plotSegregation = function(x, affected = NULL, unknown = NULL, proband = NULL,
   names(xpos) = names(ypos) = x$ID
 
   # Invoke automatic margin adjustment if not fully specified
-  if(autoMargins <- length(margins) < 4) {
+  if(length(margins) < 4) {
     margins = rep_len(margins, 4)
     xr = align$xrange
     yr = align$yrange

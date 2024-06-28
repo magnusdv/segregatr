@@ -12,10 +12,37 @@ status](https://www.r-pkg.org/badges/version/segregatr)](https://CRAN.R-project.
 <!-- badges: end -->
 
 The goal of **segregatr** is to provide segregation analysis for
-clinical variant classification. For a real-case diagnostic application
-of the package, see Ratajska et al (2023). [The use of segregation
-analysis in interpretation of sequence variants in
+clinical variant classification. Specifically it facilitates the
+calculation of full-likelihood Bayes factors (FLBs) in any medical
+pedigree.
+
+#### Citation
+
+If you use **segregatr** in a publication, please cite this paper:
+Ratajska et al. (2023). [The use of segregation analysis in
+interpretation of sequence variants in
 SMAD3](https://doi.org/10.1002/mgg3.2107).
+
+The paper includes applications of the package in real-life diagnostic
+cases.
+
+#### Shiny app
+
+A Shiny app **shinyseg** for clinical segregation analysis is now
+available! Check it out here:
+<https://chrcarrizosa.shinyapps.io/shinyseg/>.
+
+The app is based on **segregatr**, but offers a wealth of additional
+features:
+
+- interactive visualisations
+- complex disease modelling
+- sensitivity analysis
+- clinical interpretation for use in the ACMG-AMP framework
+
+For details, see Carrizosa et al. (2024): [shinyseg: a web application
+for flexible cosegregation and sensitivity
+analysis](https://doi.org/10.1093/bioinformatics/btae201).
 
 ## Installation
 

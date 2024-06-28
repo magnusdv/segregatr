@@ -6,7 +6,7 @@
 \alias{segregatr-package}
 \title{segregatr: Segregation Analysis for Variant Interpretation}
 \description{
-An implementation of the full-likelihood Bayes factor (FLB) for evaluating segregation evidence in clinical medical genetics. The method was introduced by Thompson et al. (2003) \doi{10.1086/378100}. This implementation supports custom penetrance values and liability classes, and allows visualisations and robustness analysis as presented in Ratajska et al. (2023) \doi{10.1002/mgg3.2107}.
+An implementation of the full-likelihood Bayes factor (FLB) for evaluating segregation evidence in clinical medical genetics. The method was introduced by Thompson et al. (2003) \doi{10.1086/378100}. This implementation supports custom penetrance values and liability classes, and allows visualisations and robustness analysis as presented in Ratajska et al. (2023) \doi{10.1002/mgg3.2107}. See also the online app 'shinyseg', \url{https://chrcarrizosa.shinyapps.io/shinyseg}, which offers interactive segregation analysis with many additional features (Carrizosa et al. (2024) \doi{10.1093/bioinformatics/btae201}).
 }
 \seealso{
 Useful links:
