@@ -2,8 +2,10 @@
 
 export(FLB)
 export(plotSegregation)
+export(sFLB)
 import(pedtools)
 importFrom(graphics,arrows)
 importFrom(graphics,strheight)
 importFrom(graphics,text)
 importFrom(pedprobr,likelihood)
+importFrom(stats,aggregate)
