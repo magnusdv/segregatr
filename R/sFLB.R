@@ -3,14 +3,7 @@
 #' Computes the shared Bayes factor for co-segregation, assuming autosomal
 #' dominant inheritance and a single introduction of the variant.
 #'
-#' @param x A [pedtools::ped()] object.
-#' @param carriers A character vector (or coercible to such), containing the ID
-#'   labels of pedigree members known to carry one copy of the variant in
-#'   question.
-#' @param noncarriers A character vector (or coercible to such), containing the
-#'   ID labels of pedigree members known *not* to carry the variant in question.
-#' @param affected The affected pedigree members.
-#' @param unknown Pedigree members with unknown affection status.
+#' @inheritParams FLB
 #' @param penetrances A numeric vector of length 3 `(f0, f1, f2)`, or a
 #'   matrix-like with 3 columns, where row `i` contains the penetrances of
 #'   liability class `i`.
@@ -20,7 +13,7 @@
 #'   in order. (If `penetrances` is just a vector, it will be used for all
 #'   classes.) If `liability` is NULL (the default), it is set to `1` for all
 #'   individuals.
-#' @param ... Optional parameters passed on to [segregatr::rareDistr()].
+#' @param ... Further parameters.
 #'
 #' @references Ratajska A, Vigeland MD, Wirgenes KV, *et al*. *The use of
 #'   segregation analysis in interpretation of sequence variants in SMAD3: A
@@ -65,7 +58,8 @@ sFLB = function(x, carriers = NULL, noncarriers = NULL, affected = NULL,
     rowSums(distr[, noncarriers, drop = FALSE] == 0) == length(noncarriers)
 
   # Assign penetrances
-  affvec = setNames(rep(1, pedsize(x)), x$ID)
+  affvec = rep(1, pedsize(x))
+  names(affvec) = x$ID
   affvec[unknown] = NA
   affvec[affected] = 0
 

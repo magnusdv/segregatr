@@ -40,7 +40,7 @@ in order. (If \code{penetrances} is just a vector, it will be used for all
 classes.) If \code{liability} is NULL (the default), it is set to \code{1} for all
 individuals.}
 
-\item{...}{Optional parameters passed on to \code{\link[=rareDistr]{rareDistr()}}.}
+\item{...}{Further parameters.}
 }
 \value{
 A positive number, the sFLB score.

@@ -1,4 +1,4 @@
-
+#' @importFrom stats aggregate
 rareDistr = function(x, typable = NULL, proband = NULL, commonAnc = FALSE) {
 
   if (is.null(proband)) proband = x$ID
@@ -20,7 +20,8 @@ rareDistr = function(x, typable = NULL, proband = NULL, commonAnc = FALSE) {
         currentCols = names(distr)
         cases = names(gens[gens == g])
         cases0 = lapply(cases, function(w) rowSums(distr[, pedtools::parents(x, w), drop = FALSE]) == 0)
-        cases01 = setNames(rep(list(c(0L,1L)), length(cases)), cases)
+        cases01 = rep(list(c(0L,1L)), length(cases))
+        names(cases01) = cases
 
         # Build all new rows as a list
         newDistrList = vector("list", nrow(distr))
