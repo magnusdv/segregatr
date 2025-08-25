@@ -1,3 +1,8 @@
+# segregatr 0.5.0
+
+* New function `sFLB()` computing a 'shared' (proband-free) version of the FLB score.
+
+
 # segregatr 0.4.0
 
 * Liability classes are now supported also in looped pedigrees.
