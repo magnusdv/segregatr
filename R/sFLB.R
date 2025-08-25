@@ -28,8 +28,6 @@
 #'
 #' @return A positive number, the sFLB score.
 #'
-#' @import data.table
-#'
 #' @examples
 #'
 #' ### Case 1
@@ -50,34 +48,53 @@
 #'      noncarriers = 6:7, penetrances = c(0.01, 0.9, 0.9))
 #'
 #' @export
-sFLB = function (x, carriers = NULL, noncarriers = NULL, affected = NULL,
-                 unknown = NULL, penetrances = NULL, liability = NULL, ...)
-{
+sFLB = function(x, carriers = NULL, noncarriers = NULL, affected = NULL,
+                unknown = NULL, penetrances = NULL, liability = NULL, ...) {
+
+  # Coerce inputs
+  carriers = as.character(carriers)
+  noncarriers = as.character(noncarriers)
+  affected = as.character(affected)
+  unknown = as.character(unknown)
 
   # Calculate p(g)
   distr = rareDistr(x, typable = x$ID, proband = carriers, ...)
-  observed = apply(distr, 1, function(row) all(row[carriers] == 1) & all(row[noncarriers] == 0))
+
+  # Observed genotypes
+  observed = rowSums(distr[, carriers, drop = FALSE] == 1) == length(carriers) &
+    rowSums(distr[, noncarriers, drop = FALSE] == 0) == length(noncarriers)
 
   # Assign penetrances
   affvec = setNames(rep(1, pedsize(x)), x$ID)
   affvec[unknown] = NA
   affvec[affected] = 0
-  if (is.vector(penetrances))
-    distr[, (x$ID) := lapply(x$ID, function(i) affvec[i] - penetrances[distr[[i]]+1])]
-  else {
+
+  distr_aff = distr[, x$ID, drop = FALSE]
+
+  if (is.vector(penetrances)) {
+    for (i in x$ID) {
+      distr_aff[[i]] = affvec[i] - penetrances[distr_aff[[i]] + 1]
+    }
+  } else {
     if (is.null(liability))
       liability = rep(1, pedsize(x))
     names(liability) = x$ID
-    distr[, (x$ID) := lapply(x$ID, function(i) affvec[i] - penetrances[liability[i], distr[[i]]+1])]
+    for (i in x$ID) {
+      distr_aff[[i]] = affvec[i] - penetrances[liability[i], distr_aff[[i]] + 1]
+    }
   }
 
   # Calculate p(g|y)
-  distr[, p_H1 := Reduce("*", lapply(.SD, function(i) ifelse(is.na(i), 1, i)))]
-  distr[, p_H1 := p_H1 / sum(p_H1)]
+  lik = apply(distr_aff, 1, function(row) {
+    prod(sapply(row, function(i) if (is.na(i)) 1 else i))
+  })
+  p_H1 = lik * distr$p_H0
+  p_H1 = p_H1 / sum(p_H1)
 
   # BF = p(g|y) / p(g)
-  distr = distr[observed]
-  bf = abs(sum(distr$p_H1) / sum(distr$p_H0))
+  distr_obs = distr[observed, , drop = FALSE]
+  p_H1_obs = p_H1[observed]
 
+  bf = abs(sum(p_H1_obs) / sum(distr_obs$p_H0))
   bf
 }

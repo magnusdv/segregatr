@@ -3,7 +3,6 @@
 export(FLB)
 export(plotSegregation)
 export(sFLB)
-import(data.table)
 import(pedtools)
 importFrom(graphics,arrows)
 importFrom(graphics,strheight)
